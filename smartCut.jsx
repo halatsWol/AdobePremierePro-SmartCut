@@ -1,10 +1,41 @@
-// Reference to the active sequence
-var activeSequence = app.project.activeSequence;
 
+
+// Function to find timestamps of onset events in audio channel data
+function findOnsetTimestamps(channelData, threshold, audioClipTime) {
+    var onsetTimestamps = [];
+
+    for (var i = 1; i < channelData.length; i++) {
+        // Check for onset event (amplitude exceeds threshold)
+        if (Math.abs(channelData[i]) > threshold && Math.abs(channelData[i - 1]) <= threshold) {
+            // Calculate timestamp based on sample index
+            var timestamp = i / audioClip.sampleRate;
+            onsetTimestamps.push(audioClipTime+timestamp);
+        }
+    }
+    if (onsetTimestamps.length > 0) {
+        for (var i = 0; i < onsetTimestamps.length; i++) {
+            var newMarker = new MarkerValue("");
+            markerIndexValue++;
+            newMarker.label = smartCutColorBttnsSelection;
+            newMarker.comment = ["", markerIndexValue, i][smartCutNamingBttnsSelection];
+            markerLayer.property("Marker").setValueAtTime(onsetTimestamps[i], newMarker);
+        }
+    }
+}
+
+
+
+// check if a project is open
+var activeProject = app.project;
+if (!activeProject) {
+    $.writeln("No active project.");
+    return;
+}
 // Check if a sequence is open
+var activeSequence = app.project.activeSequence;
 if (activeSequence) {
     // Reference to the audio track (change the trackIndex to your desired track)
-    var audioTrackIndex = 1; 
+    var audioTrackIndex = 1;
     var audioTrack = activeSequence.audioTracks[audioTrackIndex];
 
     // Check if the audio track exists
@@ -15,15 +46,18 @@ if (activeSequence) {
 
             // Check if the clip is an audio clip
             if (audioClip.type === ProjectItemType.CLIP && audioClip.isAudio) {
+                //get audio clip time position
+                var audioClipTime = audioClip.start.seconds;
+
                 // Get audio channel data (assuming mono audio)
-                var audioChannelIndex = 0; 
+                var audioChannelIndex = 0;
                 var audioChannelData = audioClip.getAudioChannelData(audioChannelIndex);
 
-                // Set a threshold for onset detection (adjust as needed)
+                // Set a threshold for onset detection
                 var threshold = 0.5;
 
                 // Find timestamps of onset events
-                var onsetTimestamps = findOnsetTimestamps(audioChannelData, threshold);
+                findOnsetTimestamps(audioChannelData, threshold, audioClipTime);
 
                 // Print the onset timestamps
                 $.writeln("Onset Timestamps: " + onsetTimestamps);
@@ -36,18 +70,4 @@ if (activeSequence) {
     $.writeln("No active sequence.");
 }
 
-// Function to find timestamps of onset events in audio channel data
-function findOnsetTimestamps(channelData, threshold) {
-    var onsetTimestamps = [];
 
-    for (var i = 1; i < channelData.length; i++) {
-        // Check for onset event (amplitude exceeds threshold)
-        if (Math.abs(channelData[i]) > threshold && Math.abs(channelData[i - 1]) <= threshold) {
-            // Calculate timestamp based on sample index
-            var timestamp = i / audioClip.sampleRate;
-            onsetTimestamps.push(timestamp);
-        }
-    }
-
-    return onsetTimestamps;
-}
