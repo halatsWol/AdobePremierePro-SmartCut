@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+
 try:
     import os
     import tempfile
@@ -14,6 +15,7 @@ except ImportError as e:
     exit(1)
 
 cname=""
+sr=22050    # default sample rate
 
 tempPath= tempfile.gettempdir()+"\\Adobe\\Premiere Pro\\extensions\\SmartCut\\"
 lockfile = open(tempPath+"lockfile.lck", "w")
@@ -32,10 +34,10 @@ def preprocess_audio(y_stereo):
     y=reduce_Average(y_perc, sr)
     return y
 
-def reduce_Threshold(y_stereo, threshold_db, sr):
+def reduce_Threshold(y_stereo, threshold):
     print(f"starting Threshold Reduction.\n.\n.\n.\n")
     max = np.max(y_stereo)
-    threshold =max* ( threshold_db/100 )
+    threshold =max* ( threshold/100 )
     y_stereo_trimmed = np.where(y_stereo <= max-threshold, 0, y_stereo)
     plt.figure(dpi=200, figsize=(18.5, 10.5))
     librosa.display.waveshow(y_stereo, sr=sr, color="blue", alpha=0.25)
@@ -58,8 +60,14 @@ def reduce_Average(y_stereo, sr):
     plt.close()
     return y_stereo_trimmed
 
-def reduce_SignalTime(y_stereo):
-    print(f"starting Signal-Time Reduction.\n.\n.\n.\n")
+def reduce_TempF(y_stereo):
+    print(f"starting Temporal-Feature Reduction.\n.\n.\n.\n")
+     # Calculate first-order difference
+    diff_signal = np.diff(y_stereo)
+
+    # Square the differences
+    y_stereo = diff_signal ** 2
+
     plt.figure( dpi=200,figsize=(18.5, 10.5) )
     librosa.display.waveshow(y_stereo, sr=sr, color="red")
     plt.title("SignalTimed Signal")
@@ -80,33 +88,50 @@ def reduce_SignalSpectrum(y_stereo,threshold):
 
     return y_stereo
 
-def reduce_SignalTimeFrequency(y_stereo):
-    print(f"starting Signal-Time-Frequency Reduction.\n.\n.\n.\n")
-    librosa.display.waveshow(y_stereo, sr=sr, color="blue")
-    plt.title("SignalTimeFrequency Signal")
-    plt.savefig(tempPath+cname+" - reduce_SignalTimeFrequency.png")
-    plt.close()
-    return y_stereo
+def reduce_TFR(y_stereo,hop_length=512, n_fft=2048):
+    print(f"starting Time-Frequency Reduction.\n.\n.\n.\n")
+    stft_matrix = librosa.stft(y_stereo, hop_length=hop_length, n_fft=n_fft)
 
-def reduction_process(y_stereo, method, threshold,sr):
+    # Magnitude spectrogram
+    mag_spec = np.abs(stft_matrix)
+
+    # Reduce features (e.g., taking the sum along the frequency axis)
+    reduced_features = np.sum(mag_spec, axis=0)
+
+    librosa.display.waveshow(reduced_features, sr=sr, color="blue")
+    plt.title("SignalTimeFrequency Signal")
+    plt.savefig(tempPath+cname+" - reduce_TimeFrequency.png")
+    plt.close()
+    return reduced_features
+
+def reduction_process(y_stereo, method, threshold):
     print("starting Audio-Reduction:\n")
     match method:
         case "thB":           # Threshold-based
-            return reduce_Threshold(y_stereo, threshold,sr)
-        case "sig_timeB":     # Signal-time-based
-            return reduce_SignalTime(y_stereo)
-        case "sig_specB":     # Signal-spectrum-based
+            return reduce_Threshold(y_stereo, threshold)
+        case "sig_tempF":     # Signal-time-based
+            return reduce_TempF(y_stereo)
+        case "sig_spec":     # Signal-spectrum-based
             return reduce_SignalSpectrum(y_stereo,threshold)
-        case "sig_timeFreqB": # Signal-time-frequency-based
-            return reduce_SignalTimeFrequency(y_stereo)
+        case "sig_TFR": # Signal-time-frequency-based
+            return reduce_TFR(y_stereo)
 
 def postprocess_audio(y_stereo, threshold):
     print(f"starting postprocess.\n.\n.\n.\n")
     return y_stereo
 
-def thresholding(data, threshold):
+def thresholding(y_stereo, threshold):
     print(f"starting thresholding cycle.\n.\n.\n.\n")
-    return data
+    max = np.max(y_stereo)
+    threshold =max* ( threshold/100 )
+    y_stereo_trimmed = np.where(y_stereo <= max-threshold, 0, y_stereo)
+    plt.figure(dpi=200, figsize=(18.5, 10.5))
+    librosa.display.waveshow(y_stereo, sr=sr, color="blue", alpha=0.25)
+    librosa.display.waveshow(y_stereo_trimmed, sr=sr, color="red", alpha=0.5)
+    plt.title("Trimmed Signal")
+    plt.savefig(tempPath +cname+" - trimSignal.png")
+    plt.close()
+    return y_stereo_trimmed
 
 def select_peaks(data):
     print(f"starting Detecting Onset-Times.\n.\n.\n.\n")
@@ -147,7 +172,7 @@ arg=arg.replace("\\", "\\\\")
 sr = int(json.loads(arg)["sr"])
 clipdata = json.loads(arg)["clipdata"]
 track=json.loads(arg)["track"]
-threshold=(100-float(json.loads(arg)["threshold"])) # threshold is given in dB below peak (max value)
+threshold=(float(json.loads(arg)["threshold"])) # threshold is given in dB below peak (max value)
 
 method=json.loads(arg)["method"]
 preprocess=json.loads(arg)["preprocess"]
@@ -162,7 +187,7 @@ for clip in clipdata:
     else:
         y_stereo = y_stereo
 
-    y_stereo = reduction_process(y_stereo, method, threshold,sr)
+    y_stereo = reduction_process(y_stereo, method, threshold)
     peaks = peak_detection(y_stereo, threshold)
     #cconvert audio-frames to seconds
     peaks = librosa.frames_to_time(peaks, sr=sr)

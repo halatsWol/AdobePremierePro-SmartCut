@@ -153,6 +153,7 @@ $.core = {
 		var argFile = new File(tempFolder.fsName + "/arg.json");
 		if (argFile.exists){
 			var lckfile = new File(tempFolder.fsName + "/lockfile.lck");
+			var lck = true;
 			while(lck){
 				$.sleep(1000);
 				if(!lckfile.exists){

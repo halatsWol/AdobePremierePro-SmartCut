@@ -29,7 +29,12 @@
 			<div id="detect" class="col">
 				<h3>Detection:</h3>
 				<div id="srMode" class="col">
-					<h4>Quality</h4>
+					<h4>Quality
+						<button id="detectHintBTN" class="btn hint tooltip">
+							<img src="lib/nfo.svg" class="nfoSvg" height="12px">
+							<span class="tooltiptext">Default&nbsp;=&nbsp;22050 Hz<br/>HQ&nbsp;=&nbsp;44100Hz<br/><b>Default</b> Recomended. HQ contains frequencies which usualy consist of noise information</span>
+						</button>
+					</h4>
 					<div id="srModeSelect" class="row">
 
 						<input type="radio" class="input" id="srDefault" name="sr_selectGroup" value="22050" checked>
@@ -47,20 +52,25 @@
 				</div>
 				<br/>
 				<div class="row">
-					<label for="ppAudio">Pre-process:&nbsp;</label>
+					<label for="ppAudio">Pre-process:
+						<button id="detectHintBTN" class="btn hint tooltip">
+							<img src="lib/nfo.svg" class="nfoSvg" height="12px">
+							<span class="tooltiptext">Splits Audio into Percussive and Harmonic Elements and passes the Percussive Elements further<br/>recommended on Audio heavy on Percussion </span>
+						</button>
+					&nbsp;&nbsp;</label>
 					<input type="checkbox" id="ppAudio" name="ppAudio" checked>
 				</div>
 
 
-				<label for="deTypes" class="row">Event detection Method:&nbsp;
+				<label for="deTypes" class="row">Audio Reduction Method:&nbsp;
 					<button id="detectHintBTN" class="btn hint tooltip">
 						<img src="lib/nfo.svg" class="nfoSvg" height="12px">
-						<span class="tooltiptext">KB&nbsp;=&nbsp;Keyframe&nbsp;Based,<br/>SB&nbsp;=&nbsp;Audio-Signal&nbsp;Based</span></button></label>
+						<span class="tooltiptext">Threshold&nbsp;=&nbsp;reduces unnecessary Audio-Data based on the Threshold Level<br/>Temporal Features&nbsp;=&nbsp;Reduction Based on the behavior of the Signal over Timel<br/>Spectrum Based&nbsp;=&nbsp;Reducing unnecessary frequenzies by boosting important Frequenzies<br/>Time-Frequency Reduction&nbsp;=&nbsp;Reduction Based on Frequenzy Changes over time</span></button></label>
 				<select name="deTypes" id="deTypes" class="input">
 					<option value="thB" selected>Threshold only</option>
-					<option value="sig_timeB">Time based (SB)</option>
-					<option value="sig_specB">Spectrum based (SB)</option>
-					<option value="sig_timeFreqB">Time-Frequency based (SB)</option>
+					<option value="sig_tempF">Temporal Feature</option>
+					<option value="sig_spec">Spectrum based</option>
+					<option value="sig_TFR">Time-Frequency Reduction</option>
 
 				</select>
 				<div id="th_sliderDiv" class="col">
