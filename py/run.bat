@@ -1,8 +1,8 @@
 @echo off
 
-CALL "SmartCut_Venv\Scripts\activate.bat"
+CALL "C:\ProgramData\Adobe\CEP\extensions\SmartCut\py\SmartCut_Venv\Scripts\activate.bat"
 
-python "analyze.py"
+python "C:\ProgramData\Adobe\CEP\extensions\SmartCut\py\analyze.py"
 
-CALL "SmartCut_Venv\Scripts\deactivate.bat"
+CALL "C:\ProgramData\Adobe\CEP\extensions\SmartCut\pySmartCut_Venv\Scripts\deactivate.bat"
 

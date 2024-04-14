@@ -37,7 +37,7 @@ def reduce_Threshold(y_stereo, threshold_db, sr):
     max = np.max(y_stereo)
     threshold =max* ( threshold_db/100 )
     y_stereo_trimmed = np.where(y_stereo <= max-threshold, 0, y_stereo)
-    plt.figure(dpi=200, figsize=(18.5*3, 10.5*3))
+    plt.figure(dpi=200, figsize=(18.5, 10.5))
     librosa.display.waveshow(y_stereo, sr=sr, color="blue", alpha=0.25)
     librosa.display.waveshow(y_stereo_trimmed, sr=sr, color="red", alpha=0.5)
     plt.title("Trimmed Signal")
@@ -50,7 +50,7 @@ def reduce_Average(y_stereo, sr):
     print(f"starting Average-Threshold Reduction.\n.\n.\n.\n")
     avg = np.mean(y_stereo)*1.25
     y_stereo_trimmed = np.where(y_stereo <= avg, 0, y_stereo)
-    plt.figure(dpi=200, figsize=(18.5*3, 10.5*3))
+    plt.figure(dpi=200, figsize=(18.5, 10.5))
     librosa.display.waveshow(y_stereo, sr=sr, color="blue", alpha=0.25)
     librosa.display.waveshow(y_stereo_trimmed, sr=sr, color="red", alpha=0.5)
     plt.title("Average Trimmed Signal")
@@ -60,7 +60,7 @@ def reduce_Average(y_stereo, sr):
 
 def reduce_SignalTime(y_stereo):
     print(f"starting Signal-Time Reduction.\n.\n.\n.\n")
-    plt.figure( dpi=200,figsize=(18.5*3, 10.5*3) )
+    plt.figure( dpi=200,figsize=(18.5, 10.5) )
     librosa.display.waveshow(y_stereo, sr=sr, color="red")
     plt.title("SignalTimed Signal")
     plt.savefig(tempPath+cname+" - SignalTime.png")
@@ -71,7 +71,7 @@ def reduce_SignalSpectrum(y_stereo,threshold):
     print(f"starting Signal-Spectrum Reduction.\n.\n.\n.\n")
     coef=(threshold/100)
     y_stereo_reduced = librosa.effects.preemphasis(y_stereo,coef=coef)
-    plt.figure( dpi=200,figsize=(18.5*3, 10.5*3) )
+    plt.figure( dpi=200,figsize=(18.5, 10.5) )
     librosa.display.waveshow(y_stereo, sr=sr, color="blue",alpha=0.25)
     librosa.display.waveshow(y_stereo_reduced, sr=sr, color="red", alpha=0.5)
     plt.title("Preemphasized Signal (Red)\nand Original Signal (Blue)")
@@ -111,7 +111,7 @@ def thresholding(data, threshold):
 def select_peaks(data):
     print(f"starting Detecting Onset-Times.\n.\n.\n.\n")
     onset_env = librosa.onset.onset_strength(y=data, sr=sr, aggregate=np.median, fmax=8000, n_mels=256)
-    plt.figure( dpi=200,figsize=(18.5*3, 10.5*3) )
+    plt.figure( dpi=200,figsize=(18.5, 10.5) )
     librosa.display.waveshow(onset_env, sr=sr, color="red")
     plt.title("Onset Strength")
     plt.savefig(tempPath+cname+" - OnsetStrength.png")
@@ -119,7 +119,7 @@ def select_peaks(data):
     times = librosa.times_like(onset_env, sr=sr)
     onset_env = librosa.to_mono(onset_env)
     onset_frames = librosa.onset.onset_detect(onset_envelope=onset_env, sr=sr)
-    plt.figure( dpi=200,figsize=(18.5*3, 10.5*3) )
+    plt.figure( dpi=200,figsize=(18.5, 10.5) )
     plt.plot(times, onset_env, label='Onset strength')
     plt.vlines(times[onset_frames], 0, onset_env.max(), color='r', alpha=0.9,linestyle='--', label='Onsets')
     plt.title("Onset Strength and Onsets")
