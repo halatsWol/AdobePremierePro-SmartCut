@@ -1,0 +1,113 @@
+body {
+    background-color: #262626;
+    color: rgb(180, 180, 180);
+    text-align: center;
+
+}
+
+input {
+    display: block;
+    margin: auto;
+    max-width: 100%;
+}
+
+.btn {
+    background-color: #262626;
+    color: rgb(180, 180, 180);
+    padding: 4px 5px;
+    margin: 8px 0;
+    border: 2px solid rgb(180, 180, 180);
+    border-radius: 24px;
+    cursor: pointer;
+    width: fit-content !important;
+}
+
+.btn_abt {
+    color: rgb(80, 91, 255);
+}
+
+.hint {
+    border: none;
+    margin: 0;
+    padding: 0;
+    height: 15px;
+    width: 15px;
+}
+
+.nfoSvg{
+    height: 15px;
+    width: auto;
+    color: #3a56f7;
+}
+
+.serif {
+    font-size: 1.5em;
+    padding-bottom: -.5em;
+}
+
+.row {
+    display: flex;
+    flex-direction: row;
+    align-content: center;
+    align-items: center;
+}
+
+.col {
+    display: flex;
+    flex-direction: column;
+    align-content: flex-start;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+header {
+    justify-content: center !important;
+    align-content: flex-end !important;
+    align-items: flex-end !important;
+}
+main {
+    align-content: flex-start;
+}
+
+.tooltip {
+    position: relative;
+    display: inline-block;
+}
+
+.tooltip .tooltiptext {
+    visibility: hidden;
+    /* width: 120px; */
+    background-color: rgb(180, 180, 180);
+    color: #000;
+    text-align: center;
+    padding: 5px 0;
+    border-radius: 6px;
+    position: absolute;
+    z-index: 1;
+    text-wrap: nowrap;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.tooltip:hover .tooltiptext {
+    visibility: visible;
+}
+.hidden{
+    display: none !important;
+}
+
+.input{
+    background-color: #1b1b1b;
+    color: rgb(180, 180, 180);
+    text-align: right;
+}
+
+input[type='radio']::after {
+    border-color: #262626;
+
+}
+
+h4{
+    margin-top: 15px;
+    margin-bottom: 10px;
+}

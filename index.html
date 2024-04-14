@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<!-- This document forms the dockable panel. The button is the <input> tag below. The <style> formats the button.
+
+		The extendscript is called through the <script type="text/javascript"> tag, which then routes it to use the adobe_cep_.evalScript to interpret that Javascript into Extendscript -->
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>SmartCut</title>
+		<script src="./lib/CSInterface.js"></script>
+		<!-- <script src="js/main.js"></script> -->
+		<link rel="stylesheet" href="css/main.css">
+	</head>
+
+	<body>
+		<header class="col">
+			<!-- <div class="row">
+				<button id="btn_pnl_reload" class="btn btn_abt" type="run" onclick="cs.evalScript('$.panel.reload()')">Reload</button>
+				<button id="btn_pnl_close" class="btn btn_abt" type="run" onclick="cs.evalScript('$.panel.close()')">Close</button>
+			</div> -->
+			<button id="btn_nfo_abt" class="btn btn_abt" type="run" onclick="abt()">About</button>
+
+		</header>
+
+		<main class="col">
+			<button id="btn_nfo_seqNFO" class="btn" type="run" onclick="seqNFO()">Sequence Infos</button>
+			<button id="btn_nfo_trackNFO" class="btn" type="run" onclick="trackNFO()">Track Infos</button>
+			<br/>
+			<div id="detect" class="col">
+				<h3>Detection:</h3>
+				<div id="srMode" class="col">
+					<h4>Quality</h4>
+					<div id="srModeSelect" class="row">
+
+						<input type="radio" class="input" id="srDefault" name="sr_selectGroup" value="22050" checked>
+						<label for="srDefault">Default</label>
+						<span>&nbsp;</span>
+						<input type="radio" class="input"  id="srHQ" name="sr_selectGroup" value="44100">
+						<label for="srHQ">HQ</label>
+					</div>
+
+				</div>
+				<br/>
+				<div class="row">
+					<label for="aTrack" class="row">Source Audio Track:&nbsp;</label>
+					<input type="number" class="input" id="aTrack" name="aTrack" min="1" max="3" value="1">
+				</div>
+				<br/>
+				<div class="row">
+					<label for="ppAudio">Pre-process:&nbsp;</label>
+					<input type="checkbox" id="ppAudio" name="ppAudio" checked>
+				</div>
+
+
+				<label for="deTypes" class="row">Event detection Method:&nbsp;
+					<button id="detectHintBTN" class="btn hint tooltip">
+						<img src="lib/nfo.svg" class="nfoSvg" height="12px">
+						<span class="tooltiptext">KB&nbsp;=&nbsp;Keyframe&nbsp;Based,<br/>SB&nbsp;=&nbsp;Audio-Signal&nbsp;Based</span></button></label>
+				<select name="deTypes" id="deTypes" class="input">
+					<option value="thB" selected>Threshold only</option>
+					<option value="sig_timeB">Time based (SB)</option>
+					<option value="sig_specB">Spectrum based (SB)</option>
+					<option value="sig_timeFreqB">Time-Frequency based (SB)</option>
+
+				</select>
+				<div id="th_sliderDiv" class="col">
+					<label for="th_slider" class="row">Threshold:</label>
+					<div class="row">
+						<input type="range" id="th_slider" name="threshold" min="0" max="100" step="0.1" value="50">
+						<input id="th_input" class="input input_3digit" name="threshold" min="0" max="100"  size="3" value="50">
+					</div>
+				</div>
+
+				<div id="detectbtns" class="row">
+
+					<button id="btn_clearMarker" class="btn" type="run" onclick="clearMarkers()">Clear</button>
+					<button id="btn_setMarker" class="btn" type="run" onclick="procAud()">Process Audio</button>
+				</div>
+			</div>
+
+			<div id="cut" class="col">
+				<h3>apply Cuts:</h3>
+				<div class="row">
+					<label for="vTrack" class="row">Video Track:&nbsp;</label>
+					<input type="number" class="input" id="vTrack" name="vTrack" min="1" max="3" value="1">
+				</div>
+				<div id="cutbtns" class="row">
+					<button id="btn_applyCut" class="btn" type="run" onclick="applyCuts()">Apply Cut</button>
+				</div>
+
+		</main>
+
+		<script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var script = document.createElement("script");
+                script.src = "js/main.js";
+                document.body.appendChild(script);
+            });
+        </script>
+	</body>
+</html>
