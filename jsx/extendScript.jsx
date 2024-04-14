@@ -1,11 +1,21 @@
-﻿#target "extendscript"
+﻿#target "extendscript"allowing you to write
 
 var proj = app.project;
 var seq = proj.activeSequence;
 
 $.nfo = {
 	abt : function() {
-		alert("Please find and read the ReadMe.txt file for instruction on how to use this panel template.")
+		output= "SmartCut\t\t\tVersion: 0.8\n";
+		output += "Developed by:\t\tkMarflow (Halatschek Wolfram)\n\n\n";
+		output += "SmartCut is a tool that helps you to cut your video clips based on the audio content.\n\n\n";
+		output += "This is a Beta Version and may contain Bugs.\n\n";
+		output += "If suddenly the Extension does not work anymore, try to clear the Extension Cache.\n";
+		output += "You can do this by deleting the Folder:\n";
+		output += "%TEMP%\\Adobe\\Premiere Pro\\extensions\\SmartCut\n";
+		output += "if this does not help, try to re-install the extension (close PP before).\n\n";
+		output += "Please report any Bugs to:\ninfo@kmarflow.com\n";
+
+		alert(output);
 	},
 
 	seqNFO : function() {
@@ -14,44 +24,16 @@ $.nfo = {
 		var txt_output= "Project Name: " + proj.name + "\n";
 		txt_output += "Sequence Name: " + seq.name + "\n";
 		txt_output += "Sequence Timebase: " + seq.timebase + "\n";
-		txt_output += "Sequence Frame Size: " + seq.frameSizeHorizontal + "x" + seq.frameSizeVertical + "\n";
-		txt_output += "Sequence Frame Rate: " + seq.frameRate + "\n";
+		txt_output += "Sequence Frame Size: " + seq.frameSizeHorizontal + "x" + seq.frameSizeVertical + "\n\n";
 		txt_output += "Markers - Count: " + seq.markers.numMarkers + "\n";
+		for(i=0;i<seq.videoTracks.numTracks;i++){
+			txt_output += "Video Track: "+(i+1)+" - Clip Count = "+seq.videoTracks[i].clips.numItems+"\n";
+		}
 		var playhead_obj = seq.getPlayerPosition();
 		txt_output += "\n\nCurrent Playhead Position:\nSeconds: " + playhead_obj["seconds"] + "\n";
 		alert(txt_output);
 	},
 
-	trackNFO : function() {
-		proj = app.project;
-		seq = proj.activeSequence;
-		var txt_output = "Clips in the project:\n\n";
-		var vtrack_count = seq.videoTracks.numTracks;
-		txt_output += "Video Tracks:\n"
-		for (var i = 0; i < vtrack_count; i++) {
-			var track = seq.videoTracks[i];
-			txt_output += "Track " + (i+1) + ":\n";
-			var clip_count = track.clips.numItems;
-			for (var j = 0; j < clip_count; j++) {
-				var clip = track.clips[j];
-				txt_output += "Clip " + (j+1) + ": " + clip.name + "\n";
-			}
-			txt_output += "\n";
-		}
-		txt_output += "\n\nAudio Tracks:\n"
-		var atrack_count = seq.audioTracks.numTracks;
-		for (var i = 0; i < atrack_count; i++) {
-			var track = seq.audioTracks[i];
-			txt_output += "Track " + (i+1) + ":\n";
-			var clip_count = track.clips.numItems;
-			for (var j = 0; j < clip_count; j++) {
-				var clip = track.clips[j];
-				txt_output += "Clip " + (j+1) + ": " + clip.name + "\n";
-			}
-			txt_output += "\n";
-		}
-		alert(txt_output);
-	},
 	vidTrckCnt : function() {
 		var vtrack_count = seq.videoTracks.numTracks;
 		alert("Number of video tracks: " + vtrack_count);
@@ -200,4 +182,3 @@ $.core = {
 		}
 	}
 }
-

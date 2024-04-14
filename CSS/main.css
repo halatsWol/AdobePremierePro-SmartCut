@@ -61,9 +61,15 @@ input {
 }
 
 header {
-    justify-content: center !important;
-    align-content: flex-end !important;
-    align-items: flex-end !important;
+    width: 100%;
+
+
+}
+.headerBTNs{
+    width: 100%;
+    justify-content: space-between;
+    align-content: center;
+    align-items: center;
 }
 main {
     align-content: flex-start;
@@ -84,9 +90,9 @@ main {
     border-radius: 6px;
     position: absolute;
     z-index: 1;
-    text-wrap: nowrap;
-    white-space: nowrap;
+    text-wrap: normal;
     text-align: left;
+    min-width: 200px;
 }
 
 .tooltip:hover .tooltiptext {
