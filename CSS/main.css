@@ -1,8 +1,22 @@
+html, body {
+    max-width: 93vw;
+}
 body {
     background-color: #262626;
     color: rgb(180, 180, 180);
     text-align: center;
+}
 
+header {
+    width: 100%;
+    max-width: 100%;
+}
+main {
+    align-content: flex-start;
+}
+
+label {
+    margin: 5px 0px;
 }
 
 input {
@@ -60,20 +74,15 @@ input {
     align-items: flex-start;
 }
 
-header {
-    width: 100%;
 
-
-}
 .headerBTNs{
     width: 100%;
+    max-width: 100%;
     justify-content: space-between;
     align-content: center;
     align-items: center;
 }
-main {
-    align-content: flex-start;
-}
+
 
 .tooltip {
     position: relative;
@@ -82,6 +91,10 @@ main {
 
 .tooltip .tooltiptext {
     visibility: hidden;
+}
+
+.tooltip .tooltiptext {
+    transition: 0s visibility;
     /* width: 120px; */
     background-color: rgb(180, 180, 180);
     color: #000;
@@ -97,6 +110,7 @@ main {
 
 .tooltip:hover .tooltiptext {
     visibility: visible;
+    transition-delay: 1s;
 }
 .hidden{
     display: none !important;
@@ -107,10 +121,12 @@ main {
     color: rgb(180, 180, 180);
     text-align: right;
 }
+.vTrackInput{
+    max-width: 3em;
+}
 
 input[type='radio']::after {
     border-color: #262626;
-
 }
 
 h4{

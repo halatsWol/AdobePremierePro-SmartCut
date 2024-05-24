@@ -12,10 +12,9 @@
 			<Locale Code="All" />
 		</LocaleList>
 		<RequiredRuntimeList>
-			<RequiredRuntime Name="CSXS" Version="8.0"/>
+			<RequiredRuntime Name="CSXS" Version="11.0"/>
 		</RequiredRuntimeList>
 	</ExecutionEnvironment>
-
 	<DispatchInfoList>
 		<Extension Id="com.kMarflow.SmartCut">
 			<DispatchInfo >

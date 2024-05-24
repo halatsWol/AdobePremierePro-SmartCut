@@ -1,4 +1,4 @@
-﻿#target "extendscript"allowing you to write
+﻿#target "extendscript"
 
 var proj = app.project;
 var seq = proj.activeSequence;
@@ -54,7 +54,7 @@ $.core = {
 		alert('Removed ' + count.toString() + ' markers');
 	},
 
-	procAud : function(jsn){
+	fetchAudTrackData : function(jsn){
 		proj = app.project;
 		seq = proj.activeSequence;
 		jsn = JSON.parse(jsn);
@@ -97,13 +97,12 @@ $.core = {
 		}
 	},
 
-	createTempFolder : function(jsn){
+	writeArgData : function(jsn){
 		var tmp = Folder.temp.fsName;
 		var tempFolder = new Folder(tmp + "/Adobe/Premiere Pro/extensions/SmartCut/");
-		try{
-			tempFolder.create();
-		} catch(e){
-			alert(e);
+		if (!tempFolder.exists){
+			try{ tempFolder.create() }
+			catch(e){ alert(e) }
 		}
 		var arg = new File(tempFolder.fsName + "/arg.json");
 		try{
@@ -113,12 +112,11 @@ $.core = {
 		} catch(e){
 			alert(e);
 		}
-		return arg.fsName;
 	},
 
 	runPy : function(){
 		var progData = Folder.appData.fsName;
-		var file = new File(progData+"/Adobe/CEP/extensions/SmartCut/py/run.bat");
+		var file = new File(progData+"/Marflow Software/SmartCut/py/run.bat");
 		if (file.exists){
 			try{
 				file.execute();
@@ -128,7 +126,6 @@ $.core = {
 		} else {
 			alert("File does not exist");
 		}
-
 		$.sleep(2000);
 		var tmp = Folder.temp.fsName;
 		var tempFolder = new Folder(tmp + "/Adobe/Premiere Pro/Extensions/SmartCut/");
@@ -146,7 +143,22 @@ $.core = {
 		else {
 			alert("cannot start analyzing Audio\nCache has been Cleared during Operation.\nPlease restart!")
 		}
-		var jsnOF=new File (tempFolder.fsName + "/onsets.json");
+	},
+
+	setMarkers : function (){
+		seq = app.project.activeSequence;
+		var tmp = Folder.temp.fsName;
+		var tempFolder = new Folder(tmp + "/Adobe/Premiere Pro/Extensions/SmartCut/");
+		if (!tempFolder.exists){
+			try{ tempFolder.create(); }
+			catch(e){
+				alert("Error:Cache-Folder in %TEMP%\\Adobe\\Premiere Pro\\Extensions\\SmartCut could not have been created.\n"+
+				"This may be because the Parent Folder is blocked by another process.\n"+
+				"Please Restart Premiere Pro, or your Device and Check if the issue has been resolved.\n\n"+
+				"Error-Message:\n"+e);
+			}
+		}
+		var jsnOF=new File (tempFolder + "/onsets.json");
 		var jsnOnsets ="";
 		if (jsnOF.exists) {
 			try{
@@ -154,9 +166,7 @@ $.core = {
 				jsnOnsets = jsnOF.read();
 				jsnOF.close();
 			}
-			catch(e) {
-				alert (e)
-			}
+			catch(e) { alert (e) }
 			jsnOnsets = JSON.parse(jsnOnsets);
 			var clipdata=jsnOnsets.clipdata;
 			for (i =0; i< clipdata.length; i++) {
@@ -174,7 +184,7 @@ $.core = {
 						alert(e);
 					}
 				}
-				alert ("Markers added");
+				alert("Markers added");
 			}
 		}
 		else {
