@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SmartCut for Adobe Premiere Pro"
-#define MyAppVersion "0.8"
+#define MyAppVersion "0.8.9"
 #define MyAppPublisher "Marflow-Software"
 #define MyAppURL "https://dev.kMarflow.com"
 
@@ -18,7 +18,7 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName=C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\SmartCut
+DefaultDirName=C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\{#MyAppName}
 DisableDirPage=yes
 DefaultGroupName={#MyAppName}
 DisableProgramGroupPage=yes
@@ -35,7 +35,7 @@ WizardStyle=modern
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "D:\OneDrive\Documents\MarflowSoftware\SmartCut\*"; Excludes: "\py\SmartCut_Venv, \Output, \out, \.vscode, \.git, *.iss, .gitignore, *.backup"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\OneDrive\Documents\MarflowSoftware\SmartCut\*"; Excludes: "\py\SmartCut_Venv, \Output, \docs, \.vscode, \.git, *.iss, .gitignore, *.backup"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "D:\OneDrive\Documents\MarflowSoftware\SmartCut\py\*"; DestDir: "C:\ProgramData\Marflow Software\SmartCut\py\"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files

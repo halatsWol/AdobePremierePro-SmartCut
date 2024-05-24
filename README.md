@@ -1,9 +1,9 @@
-## Marflow-Software 
+## Marflow-Software
 # SmartCut - for Adobe Premiere Pro
 
-- Version: 0.8
+- Version: 0.9
 - Developer: Halatschek Wolfram
-- Date: April, 2024
+- Date: May, 2024
 
 ---
 
@@ -13,7 +13,7 @@
 
 This Extension analyses an audio-track from the current active Sequence in Adobe Premiere Pro and places Markers where Onsets events occur. These markers then can be used to automatically cut and align video-clips accordingly
 
-Please be aware that it works having 1 video clip more than Onset Markers (use *Sequence info* - button within the extension). 
+Please be aware that it works having 1 video clip more than Onset Markers (use *Sequence info* - button within the extension).
 
 
 ### Install instructions
