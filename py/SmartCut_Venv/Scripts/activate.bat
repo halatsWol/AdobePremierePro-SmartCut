@@ -8,7 +8,7 @@ if defined _OLD_CODEPAGE (
     "%SystemRoot%\System32\chcp.com" 65001 > nul
 )
 
-set VIRTUAL_ENV=C:\Program Files (x86)\Common Files\Adobe\CEP\extensions\SmartCut\py\SmartCut_Venv
+set VIRTUAL_ENV=C:\ProgramData\Marflow Software\SmartCut\py\SmartCut_Venv
 
 if not defined PROMPT set PROMPT=$P$G
 
