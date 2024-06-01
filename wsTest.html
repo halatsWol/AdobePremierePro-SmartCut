@@ -6,6 +6,7 @@
 		<title>SmartCut</title>
 		<!-- <script src="./lib/CSInterface.js"></script> -->
 		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/wsPanel.css">
 	</head>
 
 	<body>
@@ -15,6 +16,30 @@
 				<button id="btn_nfo_abt" class="btn btn_abt" type="run" onclick="">About</button>
 			</div>
 		</header>
+		<div id="wsPanelBG" class="col hidden">
+			<div id="wsPanel" class="row">
+				<div id="wsPanelWindow" class="col">
+					<div id="wsPanelMsgWindow" class="col">
+						<h2>Audio-Analysis:</h2>
+						<div id="wsPanelStatusMsgs">
+							<p>test1</p>
+							<p>test2</p>
+						</div>
+					</div>
+					<div id="wsPanelBtns" class="row">
+						<button id="btn_stopProcessing" class="btn tooltip" type="run" onclick="stopProcessing()">Stop
+							<span class="tooltiptext">Analyses the content of the Audio-Track set above, and places Markers at detected onset Events.</span>
+						</button>
+						<button id="btn_closePanel" class="btn tooltip hidden" type="run" onclick="btn_closePanel()">Close
+							<span class="tooltiptext">Analyses the content of the Audio-Track set above, and places Markers at detected onset Events.</span>
+						</button>&nbsp;
+						<button id="btn_restartProcessing" class="btn tooltip" type="run" onclick="restartProcessing()">Restart
+							<span class="tooltiptext">Analyses the content of the Audio-Track set above, and places Markers at detected onset Events.</span>
+						</button>&nbsp;
+					</div>
+				</div>
+			</div>
+		</div>
 
 		<main class="col">
 			<div id="detect" class="col">
@@ -85,7 +110,7 @@
 					<button id="btn_setMarker" class="btn tooltip" type="run" onclick="procAud()">Process Audio
 						<span class="tooltiptext">Analyses the content of the Audio-Track set above, and places Markers at detected onset Events.</span>
 					</button>&nbsp;
-					<button id="btn_rSetMarker" class="btn tooltip" type="run" onclick="">Reset Cut-Markers
+					<button id="btn_SetMarker" class="btn tooltip" type="run" onclick="">Reset Cut-Markers
 						<span class="tooltiptext">Set the markers again based on the last <i>Process Audio</i> run</span>
 					</button>
 				</div>

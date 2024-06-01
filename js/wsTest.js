@@ -16,63 +16,94 @@ th_input.addEventListener("change", (event) => {
     th_slider.value = val;
 });
 
-function abt() {
-    var cs = new CSInterface();
-    cs.evalScript('$.nfo.abt()');
-}
-
-function seqNFO() {
-    var cs = new CSInterface();
-    cs.evalScript('$.nfo.seqNFO()');
-}
-
-function clearMarkers() {
-    var cs = new CSInterface();
-    cs.evalScript('$.core.clearMarkers()');
-}
-function setMarkers() {
-    var cs = new CSInterface();
-    cs.evalScript("$.core.setMarkers()")
-}
-
-function procAud() {
-    var cs = new CSInterface();
-    // get parameters from user interface
-    var method = document.getElementById('deTypes').value;
-    var track = document.getElementById('aTrack').value;
-    var ppA = false; // not PPAP ;-D
-    var sr = 22050; // default Sample Rate
-    Array.from( srModeSelectP.childNodes ).forEach( child => {
-        if (child.nodeType === Node.ELEMENT_NODE && child.tagName === 'INPUT') {
-            if (child.checked) { sr = child.value; }
+var socket = new WebSocket('ws://localhost:11616');
+async function procAud() {
+    var wsPanelBG = document.getElementById("wsPanelBG");
+    if (wsPanelBG.classList.contains("hidden")) {
+        wsPanelBG.classList.remove("hidden");
+        var btn_stopProcessing = document.getElementById("btn_stopProcessing");
+        if (btn_stopProcessing.classList.contains("hidden")) {
+            btn_stopProcessing.classList.remove("hidden");
         }
-    });
-    if (ppAudio.checked) { ppA = true;} // Pre-Processing switch
-    else { ppA = false;}
-    var jsn = JSON.stringify({ sr: parseInt(sr), preprocess: ppA, method: method, th: th_input.value, track: track });
-    // execute ExtendScript as promises
-    cs.evalScript("$.core.fetchAudTrackData('" + jsn + "')", function(pyArg) {
-        cs.evalScript("$.core.writeArgData('" + pyArg + "')", function() {
-            cs.evalScript('$.core.runPy()', function() {
-                setMarkers()
-            });
-        });
-    });
+        var btn_closePanel = document.getElementById("btn_closePanel");
+        if (! btn_closePanel.classList.contains("hidden")) {
+            btn_closePanel.classList.add("hidden");
+        }
+    }
+    var message =JSON.stringify({ctrl:"msg",data:"start Processing"});
+    if (socket.readyState === WebSocket.OPEN) {
+        // If the connection is already open, send the message immediately
+        socket.send(message);
+    } else {
+        // If the connection is not open, set an event handler to send the message when the connection opens
+        socket.onopen = function() {
+            socket.send(message);
+        };
+    }
+    socket.onmessage = function(event) {
+        var wsPanelStatusMsgs = document.getElementById("wsPanelStatusMsgs");
+        var p = document.createElement("p");
+        console.log(event.data);
+        data=JSON.parse(event.data);
+        console.log(data);
+        p.textContent = data.data;
+        wsPanelStatusMsgs.appendChild(p);
+        wsPanelStatusMsgs.scrollTop = wsPanelStatusMsgs.scrollHeight;
+        if (data.data=="done"){
+            stopProcessing()
+        }
+    };
+
 }
 
-
-function applyCuts() {
-    var cs = new CSInterface();
-    cs.evalScript("$.core.applyCuts(" + vTrack.value + ")");
+async function stopProcessing(){
+    var message =JSON.stringify({ctrl:"ctrl",data:"stop"});
+    if (socket.readyState === WebSocket.OPEN) {
+        // If the connection is already open, send the message immediately
+        socket.send(message);
+    } else {
+        // If the connection is not open, set an event handler to send the message when the connection opens
+        socket.onopen = function() {
+            socket.send(message);
+        };
+    }
+    var btn_stopProcessing = document.getElementById("btn_stopProcessing");
+    if (! btn_stopProcessing.classList.contains("hidden")) {
+        btn_stopProcessing.classList.add("hidden");
+        var btn_closePanel = document.getElementById("btn_closePanel");
+        if (btn_closePanel.classList.contains("hidden")) {
+            btn_closePanel.classList.remove("hidden");
+        }
+    }
 }
-
-
-function vidTrckCnt() {
-    var cs = new CSInterface();
-    cs.evalScript('$.core.vidTrckCnt()');
+async function btn_closePanel() {
+    var wsPanelBG = document.getElementById("wsPanelBG");
+    if (! wsPanelBG.classList.contains("hidden")) {
+        wsPanelBG.classList.add("hidden");
+    }
+    var wsPanelStatusMsgs = document.getElementById("wsPanelStatusMsgs");
+    var paragraphs = wsPanelStatusMsgs.getElementsByTagName("p");
+    for (var i = paragraphs.length - 1; i >= 0; i--) {
+        wsPanelStatusMsgs.removeChild(paragraphs[i]);
+    }
 }
-
-
-vTrack.addEventListener("change", (event) => {
-    vidTrckCnt();
-});
+async function restartProcessing(){
+    var message =JSON.stringify({ctrl:"ctrl",data:"restart"});
+    var btn_stopProcessing = document.getElementById("btn_stopProcessing");
+    if (btn_stopProcessing.classList.contains("hidden")) {
+        btn_stopProcessing.classList.remove("hidden");
+    }
+    var btn_closePanel = document.getElementById("btn_closePanel");
+    if (! btn_closePanel.classList.contains("hidden")) {
+        btn_closePanel.classList.add("hidden");
+    }
+    if (socket.readyState === WebSocket.OPEN) {
+        // If the connection is already open, send the message immediately
+        socket.send(message);
+    } else {
+        // If the connection is not open, set an event handler to send the message when the connection opens
+        socket.onopen = function() {
+            socket.send(message);
+        };
+    }
+}
