@@ -32,7 +32,7 @@ async def sendMsg(ws,msg):
                     task.cancel
             print(f"running task canceled")
         except asyncio.TimeoutError:  # Catch the timeout error
-            print(f"No connection for over {TIMEOUT} seconds, stopping server")
+            print(f"Send Message: No connection for over {TIMEOUT} seconds, stopping server")
             loop.stop()  # Stop the event loop
         except Exception as e:
             print(f"Unexpected error: {e}")
@@ -42,7 +42,36 @@ async def handle_message(ws):
     while True:
         if ws.open:
             try:
+                print("Waiting for message")
                 message = await asyncio.wait_for(ws.recv(), TIMEOUT)
+                ms=f"Received message"
+                await sendMsg(ws,'{"ctrl":"msg","data":"'+ms+'"}') # receives string like {ctrl:"msg",data:"start Processing"}
+                try:
+                    data = json.loads(message)
+                    # Process the data here
+                    match data['ctrl']:
+                        case 'msg':
+                            ms=f"message received"
+                            await sendMsg(ws,'{"ctrl":"msg","data":"'+ms+'"}')
+                            if task:
+                                task.cancel()
+                            task = asyncio.create_task(timelyTask(ws))
+                        case 'ctrl':
+                            match data['data']:
+                                case 'stop':
+                                    if task:
+                                        task.cancel()
+                                case 'restart':
+                                    #restart task
+                                    if task:
+                                        task.cancel()
+                                    task = asyncio.create_task(timelyTask(ws))
+                        case _:
+                            await sendMsg(ws,'{"ctrl":"msg","data":"unknown message received"}')
+
+                except json.JSONDecodeError as e:
+                    ms=f"Error decoding JSON: {e}"
+                    await sendMsg(ws,'{"ctrl":"msg","data":"'+ms+'"}')
             except websockets.exceptions.ConnectionClosedOK:
                 print("Connection closed normally")
                 if task:
@@ -56,37 +85,11 @@ async def handle_message(ws):
             except Exception as e:
                 print(f"Unexpected error: {e}")
                 break
-        else:
-            break
 
-            ms=f"Received message"
-            await sendMsg(ws,'{"ctrl":"msg","data":"'+ms+'"}') # receives string like {ctrl:"msg",data:"start Processing"}
+            if task and not task.done():  # Check if the previous task is still running
+                    print("Previous task is still running, waiting for it to finish")
+                    await task  # Wait for the previous task to finish
 
-        try:
-            data = json.loads(message)
-            # Process the data here
-            match data['ctrl']:
-                case 'msg':
-                    ms=f"message received"
-                    await sendMsg(ws,'{"ctrl":"msg","data":"'+ms+'"}')
-                    if task:
-                        task.cancel()
-                    task = asyncio.create_task(timelyTask(ws))
-                case 'ctrl':
-                    match data['data']:
-                        case 'stop':
-                            if task:
-                                task.cancel()
-                        case 'restart':
-                            #restart task
-                            if task:
-                                task.cancel()
-                            task = asyncio.create_task(timelyTask(ws))
-                case _:
-                    await sendMsg(ws,'{"ctrl":"msg","data":"unknown message received"}')
-        except json.JSONDecodeError as e:
-            ms=f"Error decoding JSON: {e}"
-            await sendMsg(ws,'{"ctrl":"msg","data":"'+ms+'"}')
 
 
 

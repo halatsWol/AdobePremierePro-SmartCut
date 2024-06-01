@@ -56,5 +56,6 @@
 
 }
 #wsPanelStatusMsgs p {
-    margin: 0 20px;
+    margin: 2px 20px;
+    font-size: large;
 }

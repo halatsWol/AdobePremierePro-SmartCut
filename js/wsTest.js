@@ -49,11 +49,12 @@ async function procAud() {
         var p = document.createElement("p");
         console.log(event.data);
         data=JSON.parse(event.data);
-        console.log(data);
+        console.log(data + " >> " + data.data);
         p.textContent = data.data;
         wsPanelStatusMsgs.appendChild(p);
         wsPanelStatusMsgs.scrollTop = wsPanelStatusMsgs.scrollHeight;
-        if (data.data=="done"){
+
+        if (data.data="done"){
             stopProcessing()
         }
     };
