@@ -56,6 +56,8 @@ async def handle_message(ws):
             except Exception as e:
                 print(f"Unexpected error: {e}")
                 break
+        else:
+            break
 
             ms=f"Received message"
             await sendMsg(ws,'{"ctrl":"msg","data":"'+ms+'"}') # receives string like {ctrl:"msg",data:"start Processing"}

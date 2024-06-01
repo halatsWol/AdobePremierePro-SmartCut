@@ -29,6 +29,10 @@ async function procAud() {
         if (! btn_closePanel.classList.contains("hidden")) {
             btn_closePanel.classList.add("hidden");
         }
+        var btn_restartProcessing = document.getElementById("btn_restartProcessing");
+        if (btn_restartProcessing.classList.contains("hidden")) {
+            btn_restartProcessing.classList.remove("hidden");
+        }
     }
     var message =JSON.stringify({ctrl:"msg",data:"start Processing"});
     if (socket.readyState === WebSocket.OPEN) {
@@ -53,6 +57,27 @@ async function procAud() {
             stopProcessing()
         }
     };
+    socket.onclose = function(event) {
+        var wsPanelStatusMsgs = document.getElementById("wsPanelStatusMsgs");
+        var p = document.createElement("p");
+        p.textContent = "Connection to Analysis-Server lost";
+        var br = document.createElement("br");
+        wsPanelStatusMsgs.appendChild(br);
+        wsPanelStatusMsgs.appendChild(p);
+        wsPanelStatusMsgs.scrollTop = wsPanelStatusMsgs.scrollHeight;
+        var btn_stopProcessing = document.getElementById("btn_stopProcessing");
+        if (! btn_stopProcessing.classList.contains("hidden")) {
+            btn_stopProcessing.classList.add("hidden");
+            var btn_closePanel = document.getElementById("btn_closePanel");
+            if (btn_closePanel.classList.contains("hidden")) {
+                btn_closePanel.classList.remove("hidden");
+            }
+        }
+        var btn_restartProcessing = document.getElementById("btn_restartProcessing");
+        if (! btn_restartProcessing.classList.contains("hidden")) {
+            btn_restartProcessing.classList.add("hidden");
+        }
+    }
 
 }
 
