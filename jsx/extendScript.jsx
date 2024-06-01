@@ -1,4 +1,5 @@
 ﻿#target "extendscript"
+#include "json2.js"
 
 var proj = app.project;
 var seq = proj.activeSequence;
@@ -54,10 +55,13 @@ $.core = {
 		alert('Removed ' + count.toString() + ' markers');
 	},
 
+
+
 	fetchAudTrackData : function(jsn){
 		proj = app.project;
 		seq = proj.activeSequence;
 		jsn = JSON.parse(jsn);
+
 		var tnr= jsn.track -1;
 		var track = seq.audioTracks[tnr];
 		var clipdata = [];

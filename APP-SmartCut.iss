@@ -35,7 +35,7 @@ WizardStyle=modern
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "D:\OneDrive\Documents\MarflowSoftware\SmartCut\*"; Excludes: "\py\SmartCut_Venv, \Output, \docs, \.vscode, \.git, *.iss, .gitignore, *.backup"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\OneDrive\Documents\MarflowSoftware\SmartCut\*"; Excludes: "\py\SmartCut_Venv, \Output, \docs, *\Doc, \.vscode, \.git, *.iss, .gitignore, *.backup"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
 Source: "D:\OneDrive\Documents\MarflowSoftware\SmartCut\py\*"; DestDir: "C:\ProgramData\Marflow Software\SmartCut\py\"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
