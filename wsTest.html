@@ -4,15 +4,15 @@
 	<head>
 		<meta charset="utf-8">
 		<title>SmartCut</title>
-		<script src="./lib/CSInterface.js"></script>
+		<!-- <script src="./lib/CSInterface.js"></script> -->
 		<link rel="stylesheet" href="css/main.css">
 	</head>
 
 	<body>
 		<header class="col">
 			<div class="row headerBTNs">
-				<button id="btn_nfo_seqNFO" class="btn" type="run" onclick="seqNFO()">Sequence Infos</button>
-				<button id="btn_nfo_abt" class="btn btn_abt" type="run" onclick="abt()">About</button>
+				<button id="btn_nfo_seqNFO" class="btn" type="run" onclick="">Sequence Infos</button>
+				<button id="btn_nfo_abt" class="btn btn_abt" type="run" onclick="">About</button>
 			</div>
 		</header>
 
@@ -79,13 +79,13 @@
 				</div>
 
 				<div id="detectbtns" class="row">
-					<button id="btn_clearMarker" class="btn tooltip" type="run" onclick="clearMarkers()">Clear Markers
+					<button id="btn_clearMarker" class="btn tooltip" type="run" onclick="">Clear Markers
 						<span class="tooltiptext">Removes all Markers in the active Sequence</span>
 					</button>&nbsp;
 					<button id="btn_setMarker" class="btn tooltip" type="run" onclick="procAud()">Process Audio
 						<span class="tooltiptext">Analyses the content of the Audio-Track set above, and places Markers at detected onset Events.</span>
 					</button>&nbsp;
-					<button id="btn_rSetMarker" class="btn tooltip" type="run" onclick="setMarkers()">Reset Cut-Markers
+					<button id="btn_rSetMarker" class="btn tooltip" type="run" onclick="">Reset Cut-Markers
 						<span class="tooltiptext">Set the markers again based on the last <i>Process Audio</i> run</span>
 					</button>
 				</div>
@@ -98,7 +98,7 @@
 					<input type="number" class="input vTrackInput" id="vTrack" name="vTrack" min="1" max="3" value="1">
 				</div>
 				<div id="cutbtns" class="row">
-					<button id="btn_applyCut" class="btn" type="run" onclick="applyCuts()">Apply Cut</button>
+					<button id="btn_applyCut" class="btn" type="run" onclick="">Apply Cut</button>
 				</div>
 			</div>
 
@@ -107,7 +107,7 @@
 		<script>
             document.addEventListener("DOMContentLoaded", function() {
                 var script = document.createElement("script");
-                script.src = "js/main.js";
+                script.src = "js/wsTest.js";
                 document.body.appendChild(script);
             });
         </script>
