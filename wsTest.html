@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>SmartCut</title>
+		<script src="./lib/CSInterface.js"></script>
+		<link rel="stylesheet" href="css/main.css">
+	</head>
+
+	<body>
+		<header class="col">
+			<div class="row headerBTNs">
+				<button id="btn_nfo_seqNFO" class="btn" type="run" onclick="seqNFO()">Sequence Infos</button>
+				<button id="btn_nfo_abt" class="btn btn_abt" type="run" onclick="abt()">About</button>
+			</div>
+		</header>
+
+		<main class="col">
+			<div id="detect" class="col">
+				<h3>Detection:</h3>
+				<div id="srMode" class="col">
+					<h4>Quality:
+						<button id="qual_detectHintBTN" class="btn hint tooltip">
+							<img src="lib/nfo.svg" class="nfoSvg" height="12px">
+							<span class="tooltiptext">LQ&nbsp;=&nbsp;11025 Hz<br/>Default&nbsp;=&nbsp;22050 Hz<br/>HQ&nbsp;=&nbsp;44100Hz<br/><b>Default</b> Recomended. HQ contains frequencies which usualy consist of noise information</span>
+						</button>
+					</h4>
+					<div id="srModeSelect" class="row">
+						<input type="radio" class="input" id="srLQ" name="sr_selectGroup" value="11025" checked>
+						<label for="srLQ">&nbsp;LQ</label>
+						<span>&nbsp;&nbsp;&nbsp;</span>
+						<input type="radio" class="input" id="srDefault" name="sr_selectGroup" value="22050" checked>
+						<label for="srDefault">&nbsp;Default</label>
+						<span>&nbsp;&nbsp;&nbsp;</span>
+						<input type="radio" class="input"  id="srHQ" name="sr_selectGroup" value="44100">
+						<label for="srHQ">&nbsp;HQ</label>
+					</div>
+				</div>
+
+				<div class="row">
+					<label for="aTrack" class="row">Source Audio Track:&nbsp;</label>
+					<input type="number" class="input vTrackInput" id="aTrack" name="aTrack" min="1" max="3" value="1">
+				</div>
+
+				<div class="row">
+					<label for="ppAudio">Pre-process:
+						<button id="pp_detectHintBTN" class="btn hint tooltip">
+							<img src="lib/nfo.svg" class="nfoSvg" height="12px">
+							<span class="tooltiptext">Splits Audio into Percussive and Harmonic Elements and passes the Percussive Elements further<br/>recommended on Audio heavy on Percussion </span>
+						</button>
+					&nbsp;&nbsp;</label>
+					<input type="checkbox" id="ppAudio" name="ppAudio" checked>
+				</div>
+
+
+				<label for="deTypes" class="row">Audio Reduction Method:&nbsp;
+					<button id="meth_detectHintBTN" class="btn hint tooltip">
+						<img src="lib/nfo.svg" class="nfoSvg" height="12px">
+						<span class="tooltiptext">Threshold&nbsp;=&nbsp;reduces unnecessary Audio-Data based on the Threshold Level<br/>Temporal Features&nbsp;=&nbsp;Reduction Based on the behavior of the Signal over Timel</span>
+					</button>
+				</label>
+				<select name="deTypes" id="deTypes" class="input">
+					<option value="thB" selected>Threshold</option>
+					<option value="sig_tempF">Temporal Feature</option>
+
+				</select>
+				<div id="th_sliderDiv" class="col">
+					<label for="th_slider" class="</div>row">Threshold:&nbsp;
+						<button id="th_detectHintBTN" class="btn hint tooltip">
+							<img src="lib/nfo.svg" class="nfoSvg" height="12px">
+							<span class="tooltiptext">Threshold&nbsp;=&nbsp;Threshold-Level in percent in relation to the signal;<br/>0% no thresholding;<br/>100% threshold level is set to the maximum = all signals will be reduced<br/><br/><b>Temporal Feature</b> uses the Threshold for Intensity (the higher the value, the higher the effect)</span>
+						</button>
+					</label>
+					<div class="row">
+						<input type="range" id="th_slider" name="threshold" min="0" max="100" step="0.1" value="50">
+						<input id="th_input" class="input input_3digit" name="threshold" min="0" max="100"  size="3" value="50">
+					</div>
+				</div>
+
+				<div id="detectbtns" class="row">
+					<button id="btn_clearMarker" class="btn tooltip" type="run" onclick="clearMarkers()">Clear Markers
+						<span class="tooltiptext">Removes all Markers in the active Sequence</span>
+					</button>&nbsp;
+					<button id="btn_setMarker" class="btn tooltip" type="run" onclick="procAud()">Process Audio
+						<span class="tooltiptext">Analyses the content of the Audio-Track set above, and places Markers at detected onset Events.</span>
+					</button>&nbsp;
+					<button id="btn_rSetMarker" class="btn tooltip" type="run" onclick="setMarkers()">Reset Cut-Markers
+						<span class="tooltiptext">Set the markers again based on the last <i>Process Audio</i> run</span>
+					</button>
+				</div>
+			</div>
+
+			<div id="cut" class="col">
+				<h3>apply Cuts:</h3>
+				<div class="row">
+					<label for="vTrack" class="row">Video Track:&nbsp;</label>
+					<input type="number" class="input vTrackInput" id="vTrack" name="vTrack" min="1" max="3" value="1">
+				</div>
+				<div id="cutbtns" class="row">
+					<button id="btn_applyCut" class="btn" type="run" onclick="applyCuts()">Apply Cut</button>
+				</div>
+			</div>
+
+		</main>
+
+		<script>
+            document.addEventListener("DOMContentLoaded", function() {
+                var script = document.createElement("script");
+                script.src = "js/main.js";
+                document.body.appendChild(script);
+            });
+        </script>
+	</body>
+</html>
