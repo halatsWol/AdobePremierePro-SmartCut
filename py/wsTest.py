@@ -61,11 +61,6 @@ async def handle_message(ws):
                                 case 'stop':
                                     if task:
                                         task.cancel()
-                                case 'restart':
-                                    #restart task
-                                    if task:
-                                        task.cancel()
-                                    task = asyncio.create_task(timelyTask(ws))
                         case _:
                             await sendMsg(ws,'{"ctrl":"msg","data":"unknown message received"}')
 
@@ -88,6 +83,21 @@ async def handle_message(ws):
 
             if task and not task.done():  # Check if the previous task is still running
                     print("Previous task is still running, waiting for it to finish")
+                    message = await ws.recv()
+                    ms=f"Received message"
+                    await sendMsg(ws,'{"ctrl":"msg","data":"'+ms+'"}') # receives string like {ctrl:"msg",data:"start Processing"}
+                    try:
+                        pmsg= json.loads(message)
+                        # Process the data here
+                        match pmsg['data']:
+                            case 'stop':
+                                if task:
+                                    task.cancel()
+                            case _:
+                                await sendMsg(ws,'{"ctrl":"msg","data":"unknown message received"}')
+                    except json.JSONDecodeError as e:
+                        ms=f"Error decoding JSON: {e}"
+                        await sendMsg(ws,'{"ctrl":"msg","data":"'+ms+'"}')
                     await task  # Wait for the previous task to finish
 
 

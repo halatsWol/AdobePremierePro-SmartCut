@@ -29,10 +29,6 @@ async function procAud() {
         if (! btn_closePanel.classList.contains("hidden")) {
             btn_closePanel.classList.add("hidden");
         }
-        var btn_restartProcessing = document.getElementById("btn_restartProcessing");
-        if (btn_restartProcessing.classList.contains("hidden")) {
-            btn_restartProcessing.classList.remove("hidden");
-        }
     }
     var message =JSON.stringify({ctrl:"msg",data:"start Processing"});
     if (socket.readyState === WebSocket.OPEN) {
@@ -54,7 +50,9 @@ async function procAud() {
         wsPanelStatusMsgs.appendChild(p);
         wsPanelStatusMsgs.scrollTop = wsPanelStatusMsgs.scrollHeight;
 
-        if (data.data="done"){
+        if (data.data.trim()==="done"){
+            console.log("done triggered: "+ data.data=="done");
+
             stopProcessing()
         }
     };
@@ -73,10 +71,6 @@ async function procAud() {
             if (btn_closePanel.classList.contains("hidden")) {
                 btn_closePanel.classList.remove("hidden");
             }
-        }
-        var btn_restartProcessing = document.getElementById("btn_restartProcessing");
-        if (! btn_restartProcessing.classList.contains("hidden")) {
-            btn_restartProcessing.classList.add("hidden");
         }
     }
 
@@ -111,25 +105,5 @@ async function btn_closePanel() {
     var paragraphs = wsPanelStatusMsgs.getElementsByTagName("p");
     for (var i = paragraphs.length - 1; i >= 0; i--) {
         wsPanelStatusMsgs.removeChild(paragraphs[i]);
-    }
-}
-async function restartProcessing(){
-    var message =JSON.stringify({ctrl:"ctrl",data:"restart"});
-    var btn_stopProcessing = document.getElementById("btn_stopProcessing");
-    if (btn_stopProcessing.classList.contains("hidden")) {
-        btn_stopProcessing.classList.remove("hidden");
-    }
-    var btn_closePanel = document.getElementById("btn_closePanel");
-    if (! btn_closePanel.classList.contains("hidden")) {
-        btn_closePanel.classList.add("hidden");
-    }
-    if (socket.readyState === WebSocket.OPEN) {
-        // If the connection is already open, send the message immediately
-        socket.send(message);
-    } else {
-        // If the connection is not open, set an event handler to send the message when the connection opens
-        socket.onopen = function() {
-            socket.send(message);
-        };
     }
 }
