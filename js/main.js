@@ -8,6 +8,12 @@ var ppAudio = document.getElementById("ppAudio");
 var wsPanelStatusMsgs = document.getElementById("wsPanelStatusMsgs");
 var socket;
 
+
+var PORT=11616
+var LOGLVL=2 // 0=none ; 1=Exceptions only ; 2=all
+
+// TODO: Settings implementation
+
 th_slider.addEventListener("change", (event) => {
     var val = th_slider.value;
     th_input.value = val;
@@ -104,7 +110,11 @@ function showClosePanel() {
 
 function webSoc(argData) {
     var returnVal;
-    var socket = new WebSocket('ws://localhost:11616');
+    // check readyState to avoid multiple connections
+    if (!socket || socket.readyState != WebSocket.OPEN) {
+        socket = new WebSocket('ws://localhost:'+PORT);
+    }
+
     var wsPanelBG = document.getElementById("wsPanelBG");
     if (wsPanelBG.classList.contains("hidden")) {
         wsPanelBG.classList.remove("hidden");
@@ -137,7 +147,7 @@ function webSoc(argData) {
             case "status":
                 data=JSON.parse(event.data);
                 printNFO(data.data);
-            case "crtl":
+            case "ctrl":
                 if (data.data.trim()==="done"){
                     stopProcessing()
                 }
@@ -165,13 +175,12 @@ function webSoc(argData) {
 
 
 
-async function stopProcessing(){
+function stopProcessing(){
     sendWsMsg("ctrl","stop")
     showClosePanel();
 }
 
-async function btn_closePanel() {
-
+function btn_closePanel() {
     var wsPanelBG = document.getElementById("wsPanelBG");
     if (! wsPanelBG.classList.contains("hidden")) {
         wsPanelBG.classList.add("hidden");
