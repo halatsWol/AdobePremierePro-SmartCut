@@ -6,7 +6,28 @@
 		<title>SmartCut</title>
 		<script src="./lib/CSInterface.js"></script>
 		<link rel="stylesheet" href="css/main.css">
+		<link rel="stylesheet" href="css/wsPanel.css">
 	</head>
+
+	<div id="wsPanelBG" class="col hidden">
+		<div id="wsPanel" class="row">
+			<div id="wsPanelWindow" class="col">
+				<div id="wsPanelMsgWindow" class="col">
+					<h2>Audio-Analysis:</h2>
+					<div id="wsPanelStatusMsgs">
+					</div>
+				</div>
+				<div id="wsPanelBtns" class="row">
+					<button id="btn_stopProcessing" class="btn tooltip" type="run" onclick="stopProcessing()">Stop
+						<span class="tooltiptext">Analyses the content of the Audio-Track set above, and places Markers at detected onset Events.</span>
+					</button>
+					<button id="btn_closePanel" class="btn tooltip hidden" type="run" onclick="btn_closePanel()">Close
+						<span class="tooltiptext">Analyses the content of the Audio-Track set above, and places Markers at detected onset Events.</span>
+					</button>
+				</div>
+			</div>
+		</div>
+	</div>
 
 	<body>
 		<header class="col">
@@ -106,8 +127,8 @@
 
 		<script>
             document.addEventListener("DOMContentLoaded", function() {
-                var script = document.createElement("script");
-                script.src = "js/main.js";
+                var script1 = document.createElement("script");
+                script1.src = "js/main.js";
                 document.body.appendChild(script);
             });
         </script>

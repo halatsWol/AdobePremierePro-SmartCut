@@ -6,6 +6,7 @@ var th_input = document.getElementById("th_input");
 var vTrack = document.getElementById("vTrack");
 var ppAudio = document.getElementById("ppAudio");
 
+
 th_slider.addEventListener("change", (event) => {
     var val = th_slider.value;
     th_input.value = val;
@@ -16,8 +17,10 @@ th_input.addEventListener("change", (event) => {
     th_slider.value = val;
 });
 
-var socket = new WebSocket('ws://localhost:11616');
+
 async function procAud() {
+    var socket = new WebSocket('ws://localhost:11616');
+    var wsPanelStatusMsgs = document.getElementById("wsPanelStatusMsgs");
     var wsPanelBG = document.getElementById("wsPanelBG");
     if (wsPanelBG.classList.contains("hidden")) {
         wsPanelBG.classList.remove("hidden");
@@ -41,7 +44,6 @@ async function procAud() {
         };
     }
     socket.onmessage = function(event) {
-        var wsPanelStatusMsgs = document.getElementById("wsPanelStatusMsgs");
         var p = document.createElement("p");
         console.log(event.data);
         data=JSON.parse(event.data);
@@ -57,7 +59,6 @@ async function procAud() {
         }
     };
     socket.onclose = function(event) {
-        var wsPanelStatusMsgs = document.getElementById("wsPanelStatusMsgs");
         var p = document.createElement("p");
         p.textContent = "Connection to Analysis-Server lost";
         var br = document.createElement("br");

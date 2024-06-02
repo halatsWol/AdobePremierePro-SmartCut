@@ -5,6 +5,8 @@ var th_slider = document.getElementById("th_slider");
 var th_input = document.getElementById("th_input");
 var vTrack = document.getElementById("vTrack");
 var ppAudio = document.getElementById("ppAudio");
+var wsPanelStatusMsgs = document.getElementById("wsPanelStatusMsgs");
+var socket;
 
 th_slider.addEventListener("change", (event) => {
     var val = th_slider.value;
@@ -30,10 +32,37 @@ function clearMarkers() {
     var cs = new CSInterface();
     cs.evalScript('$.core.clearMarkers()');
 }
-function setMarkers() {
-    var cs = new CSInterface();
-    cs.evalScript("$.core.setMarkers()")
+function printNFO(data="") {
+    var p = document.createElement("p");
+    p.textContent = data;
+    wsPanelStatusMsgs.appendChild(p);
+    wsPanelStatusMsgs.scrollTop = wsPanelStatusMsgs.scrollHeight;
 }
+
+function sendWsMsg(ctrl,data) {
+    var message =JSON.stringify({ctrl:ctrl,data:data});
+    if (socket.readyState === WebSocket.OPEN) {
+        // If the connection is already open, send the message immediately
+        socket.send(message);
+    } else {
+        // If the connection is not open, set an event handler to send the message when the connection opens
+        socket.onopen = function() {
+            socket.send(message);
+        };
+    }
+}
+
+function setMarkers(data) {
+    var cs = new CSInterface();
+    cs.evalScript("$.core.setMarkers(" + data + ")",function(result) {
+        if (result ===0){
+            printNFO("")
+            printNFO("Markers set")
+        }
+    });
+}
+
+
 
 function procAud() {
     var cs = new CSInterface();
@@ -50,16 +79,109 @@ function procAud() {
     if (ppAudio.checked) { ppA = true;} // Pre-Processing switch
     else { ppA = false;}
     var jsn = JSON.stringify({ sr: parseInt(sr), preprocess: ppA, method: method, th: th_input.value, track: track });
-    // execute ExtendScript as promises
+    // execute ExtendScript function to fetch audio track data
     cs.evalScript("$.core.fetchAudTrackData('" + jsn + "')", function(pyArg) {
-        cs.evalScript("$.core.writeArgData('" + pyArg + "')", function() {
-            cs.evalScript('$.core.runPy()', function() {
-                setMarkers()
-            });
+        cs.evalScript('$.core.runPy()', function(result) {
+            if (result ===0){
+            data=webSoc(pyArg);
+            setMarkers(data)
+            }
         });
     });
 }
 
+function showClosePanel() {
+    var btn_stopProcessing = document.getElementById("btn_stopProcessing");
+    if (! btn_stopProcessing.classList.contains("hidden")) {
+        btn_stopProcessing.classList.add("hidden");
+        var btn_closePanel = document.getElementById("btn_closePanel");
+        if (btn_closePanel.classList.contains("hidden")) {
+            btn_closePanel.classList.remove("hidden");
+        }
+    }
+}
+
+
+function webSoc(argData) {
+    var returnVal;
+    var socket = new WebSocket('ws://localhost:11616');
+    var wsPanelBG = document.getElementById("wsPanelBG");
+    if (wsPanelBG.classList.contains("hidden")) {
+        wsPanelBG.classList.remove("hidden");
+        var btn_stopProcessing = document.getElementById("btn_stopProcessing");
+        if (btn_stopProcessing.classList.contains("hidden")) {
+            btn_stopProcessing.classList.remove("hidden");
+        }
+        var btn_closePanel = document.getElementById("btn_closePanel");
+        if (! btn_closePanel.classList.contains("hidden")) {
+            btn_closePanel.classList.add("hidden");
+        }
+    }
+    sendWsMsg("msg","start")
+
+    socket.onmessage = function(event) {
+        data=JSON.parse(event.data);
+        switch (data.ctrl){
+            case "msg":
+                switch (data.data){
+                    case "started":
+                        sendWsMsg("data",argData)
+                    default:
+                        var p = document.createElement("p");
+                        p.textContent = "\tUnknown Message Data Received";
+                        wsPanelStatusMsgs.appendChild(p);
+                        var br = document.createElement("br");
+                        wsPanelStatusMsgs.appendChild(br);
+                        wsPanelStatusMsgs.scrollTop = wsPanelStatusMsgs.scrollHeight;
+                }
+            case "status":
+                data=JSON.parse(event.data);
+                printNFO(data.data);
+            case "crtl":
+                if (data.data.trim()==="done"){
+                    stopProcessing()
+                }
+            case "data":
+                printNFO("");
+                printNFO("Event Data Received:    Placing Timeline Markers");
+                sendWsMsg("msg","Data Received")
+                returnVal = data.data;
+            default:
+                printNFO("\tUnknown Control Message Received");
+                printNFO("");
+        }
+    };
+    socket.onclose = function(event) {
+        var p = document.createElement("p");
+        p.textContent = "Connection to Analysis-Server lost";
+        var br = document.createElement("br");
+        wsPanelStatusMsgs.appendChild(br);
+        wsPanelStatusMsgs.appendChild(p);
+        wsPanelStatusMsgs.scrollTop = wsPanelStatusMsgs.scrollHeight;
+        showClosePanel()
+    }
+    return returnVal
+}
+
+
+
+async function stopProcessing(){
+    sendWsMsg("ctrl","stop")
+    showClosePanel();
+}
+
+async function btn_closePanel() {
+
+    var wsPanelBG = document.getElementById("wsPanelBG");
+    if (! wsPanelBG.classList.contains("hidden")) {
+        wsPanelBG.classList.add("hidden");
+    }
+    var wsPanelStatusMsgs = document.getElementById("wsPanelStatusMsgs");
+    var paragraphs = wsPanelStatusMsgs.getElementsByTagName("p");
+    for (var i = paragraphs.length - 1; i >= 0; i--) {
+        wsPanelStatusMsgs.removeChild(paragraphs[i]);
+    }
+}
 
 function applyCuts() {
     var cs = new CSInterface();

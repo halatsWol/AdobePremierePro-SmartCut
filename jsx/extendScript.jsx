@@ -101,22 +101,22 @@ $.core = {
 		}
 	},
 
-	writeArgData : function(jsn){
-		var tmp = Folder.temp.fsName;
-		var tempFolder = new Folder(tmp + "/Adobe/Premiere Pro/extensions/SmartCut/");
-		if (!tempFolder.exists){
-			try{ tempFolder.create() }
-			catch(e){ alert(e) }
-		}
-		var arg = new File(tempFolder.fsName + "/arg.json");
-		try{
-			arg.open("w");
-			arg.write(jsn);
-			arg.close();
-		} catch(e){
-			alert(e);
-		}
-	},
+	// writeArgData : function(jsn){
+	// 	var tmp = Folder.temp.fsName;
+	// 	var tempFolder = new Folder(tmp + "/Adobe/Premiere Pro/extensions/SmartCut/");
+	// 	if (!tempFolder.exists){
+	// 		try{ tempFolder.create() }
+	// 		catch(e){ alert(e) }
+	// 	}
+	// 	var arg = new File(tempFolder.fsName + "/arg.json");
+	// 	try{
+	// 		arg.open("w");
+	// 		arg.write(jsn);
+	// 		arg.close();
+	// 	} catch(e){
+	// 		alert(e);
+	// 	}
+	// },
 
 	runPy : function(){
 		var progData = Folder.appData.fsName;
@@ -131,68 +131,29 @@ $.core = {
 			alert("File does not exist");
 		}
 		$.sleep(2000);
-		var tmp = Folder.temp.fsName;
-		var tempFolder = new Folder(tmp + "/Adobe/Premiere Pro/Extensions/SmartCut/");
-		var argFile = new File(tempFolder.fsName + "/arg.json");
-		if (argFile.exists){
-			var lckfile = new File(tempFolder.fsName + "/lockfile.lck");
-			var lck = true;
-			while(lck){
-				$.sleep(1000);
-				if(!lckfile.exists){
-					lck=false;
-				}
-			}
-		}
-		else {
-			alert("cannot start analyzing Audio\nCache has been Cleared during Operation.\nPlease restart!")
-		}
+		return 0
 	},
 
-	setMarkers : function (){
+	setMarkers : function (data){
 		seq = app.project.activeSequence;
-		var tmp = Folder.temp.fsName;
-		var tempFolder = new Folder(tmp + "/Adobe/Premiere Pro/Extensions/SmartCut/");
-		if (!tempFolder.exists){
-			try{ tempFolder.create(); }
-			catch(e){
-				alert("Error:Cache-Folder in %TEMP%\\Adobe\\Premiere Pro\\Extensions\\SmartCut could not have been created.\n"+
-				"This may be because the Parent Folder is blocked by another process.\n"+
-				"Please Restart Premiere Pro, or your Device and Check if the issue has been resolved.\n\n"+
-				"Error-Message:\n"+e);
-			}
-		}
-		var jsnOF=new File (tempFolder + "/onsets.json");
-		var jsnOnsets ="";
-		if (jsnOF.exists) {
-			try{
-				jsnOF.open("r");
-				jsnOnsets = jsnOF.read();
-				jsnOF.close();
-			}
-			catch(e) { alert (e) }
-			jsnOnsets = JSON.parse(jsnOnsets);
-			var clipdata=jsnOnsets.clipdata;
-			for (i =0; i< clipdata.length; i++) {
-				var clip = clipdata[i];
-				timeList=clip.peaks;
-				for (t=0; t<timeList.length; t++) {
-					var time = timeList[t];
-					if (typeof time !== "number") {
-						time = parseFloat(time);
-					}
-					try{
-						seq.markers.createMarker(time+clip.start);
-					}
-					catch(e){
-						alert(e);
-					}
+		var jsnOnsets = data;
+		var clipdata=jsnOnsets.clipdata;
+		for (i =0; i< clipdata.length; i++) {
+			var clip = clipdata[i];
+			timeList=clip.peaks;
+			for (t=0; t<timeList.length; t++) {
+				var time = timeList[t];
+				if (typeof time !== "number") {
+					time = parseFloat(time);
 				}
-				alert("Markers added");
+				try{
+					seq.markers.createMarker(time+clip.start);
+				}
+				catch(e){
+					alert(e);
+				}
 			}
 		}
-		else {
-			alert("No onset.json File found")
-		}
+		return 0;
 	}
 }
