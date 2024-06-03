@@ -6,13 +6,13 @@ import os,datetime
 CRITICAL = 0
 ERROR = 1
 STATUS = 2
-INFO = 3
+DEBUG = 3
 loglvl=STATUS	# default log level
-logPath=str(os.getenv('LOCALAPPDATA'))+"\\MarflowSoftware\\SmartCut\\logs\\"
+logPath=str(os.getenv('APPDATA'))+"\\Marflow Software\\SmartCut\\logs\\"
 logfile = logPath + "Log_Analyse_" + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".txt"
 
 def log(msg,lvl=1):
-    if lvl<CRITICAL or lvl>INFO: lvl=1
+    if lvl<CRITICAL or lvl>DEBUG: lvl=1
     logType=""
 
     if lvl<=loglvl:
@@ -20,7 +20,7 @@ def log(msg,lvl=1):
             case 0: logType="CRITICAL ERROR"
             case 1: logType="ERROR"
             case 2: logType="STATUS"
-            case 3: logType="INFO"
+            case 3: logType="DEBUG"
         msg=f"[{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]\t{logType}\n{msg}\n"
         if not os.path.exists(logPath):
             try: os.makedirs(logPath)
@@ -52,15 +52,14 @@ task = None
 
 def readConfig():
     global sr,port,loglvl
-    configPath=str(os.getenv('LOCALAPPDATA'))+"\\MarflowSoftware\\SmartCut\\config\\config.json"
+    configPath=str(os.getenv('APPDATA'))+"\\Marflow Software\\SmartCut\\config\\config.conf"
     if os.path.exists(configPath):
         try:
             with open(configPath) as f:
                 data = json.load(f)
-                sr=data["sr"]
                 port=data["port"]
                 loglvl=data["loglvl"]
-                log(f"Config file read successfully",INFO)
+                log(f"Config file read successfully",DEBUG)
         except Exception as e:
             log(f"Error reading config file: {e}\nWorking with defaults.",ERROR)
     else:
@@ -239,7 +238,7 @@ async def sendMsg(ctrl,msg,ws):
         except Exception as e:
             log(f"Unexpected error: {e}",ERROR)
 
-        log(f"Sent message: {msg}",INFO)
+        log(f"Sent message: {msg}",DEBUG)
     else:
         log("Connection Closed: no open Connections to client",ERROR)
         if task:
@@ -252,7 +251,7 @@ async def handle_message(ws):
     while True:
         if ws.open:
             try:
-                log("Waiting for message",INFO)
+                log("Waiting for message",DEBUG)
                 message = await asyncio.wait_for(ws.recv(), TIMEOUT)
                 ms=f"Received message"
                 await sendMsg("msg",ms,ws) # receives string like {ctrl:"msg",data:"start Processing"}
@@ -297,7 +296,7 @@ async def handle_message(ws):
                 break
 
             if task and not task.done():  # Check if the previous task is still running
-                    log("Previous task is still running, waiting for it to finish",INFO)
+                    log("Previous task is still running, waiting for it to finish",DEBUG)
                     message = await ws.recv()
                     ms=f"Received message"
                     await sendMsg("msg",ms,ws) # receives string like {ctrl:"msg",data:"start Processing"}

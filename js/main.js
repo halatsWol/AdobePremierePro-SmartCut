@@ -6,13 +6,39 @@ var th_input = document.getElementById("th_input");
 var vTrack = document.getElementById("vTrack");
 var ppAudio = document.getElementById("ppAudio");
 var wsPanelStatusMsgs = document.getElementById("wsPanelStatusMsgs");
+var settPanelBG = document.getElementById("settPanelBG");
 var socket;
 
 
-var PORT=11616
-var LOGLVL=2 // 0=none ; 1=Exceptions only ; 2=all
+
+
+
+var port=11616
+var loglvl=3 // 0=Critical ; 1=Error ; 2=Status ; 3=DEBUG
 
 // TODO: Settings implementation
+function saveConfig() {
+    var cs = new CSInterface();
+    port = document.getElementById("portNr").value;
+    loglvl = document.getElementById("logLvl").value;
+    var config = {
+        "port": port,
+        "loglvl": loglvl
+    };
+    cs.evalScript("$.nfo.saveConfig(" + JSON.stringify(config) + ")");
+    // add class hide to settPanelBG
+
+    if (! settPanelBG.classList.contains("hidden")) {
+        settPanelBG.classList.add("hidden");
+    }
+}
+
+function openSettings(){
+    if (settPanelBG.classList.contains("hidden")) {
+        settPanelBG.classList.remove("hidden");
+    }
+}
+
 
 th_slider.addEventListener("change", (event) => {
     var val = th_slider.value;
@@ -112,7 +138,7 @@ function webSoc(argData) {
     var returnVal;
     // check readyState to avoid multiple connections
     if (!socket || socket.readyState != WebSocket.OPEN) {
-        socket = new WebSocket('ws://localhost:'+PORT);
+        socket = new WebSocket('ws://localhost:'+port);
     }
 
     var wsPanelBG = document.getElementById("wsPanelBG");

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-
+ <!-- TODO: Settings implementation -->
 <html>
 	<head>
 		<meta charset="utf-8">
@@ -9,33 +9,70 @@
 		<link rel="stylesheet" href="css/wsPanel.css">
 	</head>
 
-	<div id="wsPanelBG" class="col hidden">
-		<div id="wsPanel" class="row">
-			<div id="wsPanelWindow" class="col">
-				<div id="wsPanelMsgWindow" class="col">
-					<h2>Audio-Analysis:</h2>
-					<div id="wsPanelStatusMsgs">
-					</div>
-				</div>
-				<div id="wsPanelBtns" class="row">
-					<button id="btn_stopProcessing" class="btn tooltip" type="run" onclick="stopProcessing()">Stop
-						<span class="tooltiptext">Kills the Analysis-Process.</span>
-					</button>
-					<button id="btn_closePanel" class="btn tooltip hidden" type="run" onclick="btn_closePanel()">Close
-						<span class="tooltiptext">Close this Window.</span>
-					</button>
-				</div>
-			</div>
-		</div>
-	</div>
+
 
 	<body>
 		<header class="col">
 			<div class="row headerBTNs">
 				<button id="btn_nfo_seqNFO" class="btn" type="run" onclick="seqNFO()">Sequence Infos</button>
 				<button id="btn_nfo_abt" class="btn btn_abt" type="run" onclick="abt()">About</button>
+				<button id="btn_settings" class="btn" type="run" onclick="openSettings()">Settings</button>
 			</div>
 		</header>
+
+
+		<div id="settPanelBG" class="puPanelBG col hidden">
+			<div id="settPanel" class="puPanelrow">
+				<div id="settPanelWindow" class="puPanelWindow col">
+					<h2>Settings:</h2>
+					<label for="portNr">Websocket-Port:&nbsp;
+						<button id="portHintBTN" class="btn hint tooltip">
+							<img src="lib/nfo.svg" class="nfoSvg" height="12px">
+							<span class="tooltiptext">Set the Port for the Websocket-Server min=1024/max=65535</span>
+						</button>
+					</label>
+					<input type="number" class="input" id="portNr" name="portNr" min="1024" max="65535" value="11616">
+
+					<label for="logLvl" class="row">Audio Reduction Method:&nbsp;
+						<button id="logLvlHintBTN" class="btn hint tooltip">
+							<img src="lib/nfo.svg" class="nfoSvg" height="12px">
+							<span class="tooltiptext">Log-Levels:\nCritical&nbsp;=&nbsp;reduces unnecessary Audio-Data based on the Threshold Level<br/>Temporal Features&nbsp;=&nbsp;Reduction Based on the behavior of the Signal over Timel</span>
+						</button>
+					</label>
+					<select name="logLvl" id="logLvl" class="input">
+						<option value="0" >Critical Errors</option>
+						<option value="1">All Errors</option>
+						<option value="2"selected>Errors + Status</option>
+						<option value="3">Debug</option>
+					</select>
+
+					<button id="btn_saveConfig" class="btn tooltip" type="run" onclick="saveConfig()">Stop
+						<span class="tooltiptext">Save to the Config-File</span>
+					</button>
+				</div>
+			</div>
+		</div>
+
+		<div id="wsPanelBG" class="puPanelBG col hidden">
+			<div id="wsPanel" class="puPanelrow">
+				<div id="wsPanelWindow" class="puPanelWindow col">
+					<div id="wsPanelMsgWindow" class="col">
+						<h2>Audio-Analysis:</h2>
+						<div id="wsPanelStatusMsgs">
+						</div>
+					</div>
+					<div id="wsPanelBtns" class="row">
+						<button id="btn_stopProcessing" class="btn tooltip" type="run" onclick="stopProcessing()">Stop
+							<span class="tooltiptext">Kills the Analysis-Process.</span>
+						</button>
+						<button id="btn_closePanel" class="btn tooltip hidden" type="run" onclick="btn_closePanel()">Close
+							<span class="tooltiptext">Close this Window.</span>
+						</button>
+					</div>
+				</div>
+			</div>
+		</div>
+
 
 		<main class="col">
 			<div id="detect" class="col">

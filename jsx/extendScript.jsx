@@ -38,6 +38,23 @@ $.nfo = {
 	vidTrckCnt : function() {
 		var vtrack_count = seq.videoTracks.numTracks;
 		alert("Number of video tracks: " + vtrack_count);
+	},
+
+	saveConfig(config) {
+		var appdata = Folder.userData.fsName;
+		var configPath = new Folder(progData + "/Marflow Software/SmartCut/config");
+		if (!tempFolder.exists){
+			try{ tempFolder.create() }
+			catch(e){ alert(e) }
+		}
+		var configFile = new File(tempFolder.fsName + "/config.conf");
+		try{
+			configFile.open("w");
+			configFile.write(JSON.stringify(config));
+			configFile.close();
+		} catch(e){
+			alert(e);
+		}
 	}
 };
 
