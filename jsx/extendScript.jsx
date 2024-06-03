@@ -40,7 +40,7 @@ $.nfo = {
 		alert("Number of video tracks: " + vtrack_count);
 	},
 
-	saveConfig(config) {
+	saveConfig : function(config) {
 		var appdata = Folder.userData.fsName;
 		var configPath = new Folder(progData + "/Marflow Software/SmartCut/config");
 		if (!tempFolder.exists){
