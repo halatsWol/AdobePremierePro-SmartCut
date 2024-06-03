@@ -2,7 +2,7 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define MyAppName "SmartCut for Adobe Premiere Pro"
-#define MyAppVersion "0.8.9"
+#define MyAppVersion "0.9.0"
 #define MyAppPublisher "Marflow-Software"
 #define MyAppURL "https://dev.kMarflow.com"
 
@@ -35,8 +35,8 @@ WizardStyle=modern
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "D:\OneDrive\Documents\MarflowSoftware\SmartCut\*"; Excludes: "\py\SmartCut_Venv, \Output, \docs, *\Doc, \.vscode, \.git, *.iss, .gitignore, *.backup"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
-Source: "D:\OneDrive\Documents\MarflowSoftware\SmartCut\py\*"; DestDir: "C:\ProgramData\Marflow Software\SmartCut\py\"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\OneDrive\Documents\MarflowSoftware\SmartCut\*"; Excludes: "\py, wsTest.html, \Output, \docs, *\Doc, \.vscode, \js\wsTest.js \.git, *.iss, .gitignore, *.backup"; DestDir: "{app}"; Flags: ignoreversion recursesubdirs createallsubdirs
+Source: "D:\OneDrive\Documents\MarflowSoftware\SmartCut\py\*"; DestDir: "C:\ProgramData\Marflow Software\SmartCut\py\"; Excludes: "wsTest.bat, wsTest.py"; Flags: ignoreversion recursesubdirs createallsubdirs
 
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
