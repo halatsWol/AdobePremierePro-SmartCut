@@ -3,7 +3,7 @@
 actor user
 participant JavaScript as js
 participant ExtendScript as es
-participant FileSystem as fs
+
 participant Python as py
 participant PremierePro as pp
 
@@ -18,26 +18,30 @@ es <-> pp: Get Audio Track Data
 es -> es: create JSON Data
 js <<-- es: promise resolve (JSON Data)
 js -> es: $.core.writeArgData(JSON Data)
-es -> fs: Write JSON Data
+
 js <<-- es: promise resolve
 js -> es: $.core.runPy()
 
 es -> py: Execute Python script
 activate py
-py -> fs: Write lockFile
-es -> fs: wait for py (lockFile)
-py <-> fs: Read files (JSON Data)
-py -> py: Process data
-py -> fs: Write files (JSON Data)
-py -> fs: remove lockFile
+py -> py:start websocket
+es <- py: inform started
+es -> py: send data
+par
+    es <-> py: update status
+    py -> py: Process data
+else
+    py -> es: send processed Data
+end
+es -> py: stop python
 deactivate py
-es <- fs: lockFile removed
+
 js <<-- es: promise resolve
 js -> es: $.core.setMarkers()
-es -> fs: Read files (JSON Data)
+
 es -> pp: set Markers in Sequence
 user <<-- es: alert completion
-box cutting process
+box "cutting process" #LightBlue
     user -> pp: review and modify\nmarkers
     user -> js: trigger cutting process
     js -> es: $.core.applyCuts()

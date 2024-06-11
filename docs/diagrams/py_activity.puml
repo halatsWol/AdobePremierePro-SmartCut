@@ -1,0 +1,55 @@
+@startuml
+
+start
+
+:Read Configuration;
+note right
+readConfig function
+Reads port and log level
+from config file
+end note
+
+:Start WebSocket Server;
+note right
+websockets.serve(handle_message, "localhost", port)
+end note
+
+:Wait for Client Connection;
+
+repeat
+  :Receive Message from Client;
+  :Parse Message;
+  switch (Message Control Type)
+    case ('ctrl')
+      switch (Message Data)
+        case ('stop')
+          label stoptsk
+          :Cancel Task;
+          :Stop Event Loop;
+          stop
+      endswitch
+    case ('data')
+      :Start Audio Processing Task;
+      :send data to client;
+      :inform client of done;
+      :wait for stopcode;
+    case ('msg')
+      switch (Message Data)
+        case ('start')
+          :Send "started" Message to Client;
+        case ('Data Received')
+          :Send "done" Control to Client;
+      endswitch
+  endswitch
+
+
+
+repeat while (timout < 60)
+
+goto stoptsk
+
+
+
+
+
+@enduml
