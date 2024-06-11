@@ -42,12 +42,12 @@ $.nfo = {
 
 	saveConfig : function(config) {
 		var appdata = Folder.userData.fsName;
-		var configPath = new Folder(progData + "/Marflow Software/SmartCut/config");
-		if (!tempFolder.exists){
-			try{ tempFolder.create() }
+		var configPath = new Folder(appdata + "/Marflow Software/SmartCut/config");
+		if (!configPath.exists){
+			try{ configPath.create() }
 			catch(e){ alert(e) }
 		}
-		var configFile = new File(tempFolder.fsName + "/config.conf");
+		var configFile = new File(configPath.fsName + "/config.conf");
 		try{
 			configFile.open("w");
 			configFile.write(JSON.stringify(config));
@@ -55,6 +55,25 @@ $.nfo = {
 		} catch(e){
 			alert(e);
 		}
+	},
+	openConfig : function(){
+		var appdata = Folder.userData.fsName;
+		var configPath = new Folder(appdata + "/Marflow Software/SmartCut/config");
+		var configFile = new File(configPath.fsName + "/config.conf");
+		if (configFile.exists){
+			try{
+				configFile.open("r");
+				var config = configFile.read();
+				configFile.close();
+				return config;
+			} catch(e){
+				return "nc"; // no config
+			}
+
+		} else {
+			return "nc";
+		}
+
 	}
 };
 
@@ -118,26 +137,15 @@ $.core = {
 		}
 	},
 
-	// writeArgData : function(jsn){
-	// 	var tmp = Folder.temp.fsName;
-	// 	var tempFolder = new Folder(tmp + "/Adobe/Premiere Pro/extensions/SmartCut/");
-	// 	if (!tempFolder.exists){
-	// 		try{ tempFolder.create() }
-	// 		catch(e){ alert(e) }
-	// 	}
-	// 	var arg = new File(tempFolder.fsName + "/arg.json");
-	// 	try{
-	// 		arg.open("w");
-	// 		arg.write(jsn);
-	// 		arg.close();
-	// 	} catch(e){
-	// 		alert(e);
-	// 	}
-	// },
-
-	runPy : function(){
+	runPy : function(loglvl){
 		var progData = Folder.appData.fsName;
-		var file = new File(progData+"/Marflow Software/SmartCut/py/run.bat");
+
+		if (loglvl == 3) {
+			var file = new File(progData+"/Marflow Software/SmartCut/py/run.bat");
+		}
+		else {
+			var file = new File(progData+"/Marflow Software/SmartCut/py/runquiet.vbs");
+		}
 		if (file.exists){
 			try{
 				file.execute();
@@ -148,6 +156,7 @@ $.core = {
 			alert("File does not exist");
 		}
 		$.sleep(2000);
+
 		return 0
 	},
 
@@ -168,6 +177,7 @@ $.core = {
 				}
 				catch(e){
 					alert(e);
+					return 1;
 				}
 			}
 		}

@@ -1,0 +1,1 @@
+CreateObject("Wscript.Shell").Run """C:\ProgramData\Marflow Software\SmartCut\py\run.bat""", 0, True

@@ -15,16 +15,21 @@
 		<header class="col">
 			<div class="row headerBTNs">
 				<button id="btn_nfo_seqNFO" class="btn" type="run" onclick="seqNFO()">Sequence Infos</button>
-				<button id="btn_nfo_abt" class="btn btn_abt" type="run" onclick="abt()">About</button>
-				<button id="btn_settings" class="btn" type="run" onclick="openSettings()">Settings</button>
+				<div>
+					<button id="btn_settings" class="btn" type="run" onclick="openSettings()">
+						<img src="lib/gear.svg" class="gearSvg" height="14px">
+					</button>&nbsp;
+					<button id="btn_nfo_abt" class="btn btn_abt" type="run" onclick="abt()">About</button>
+				</div>
 			</div>
 		</header>
 
 
 		<div id="settPanelBG" class="puPanelBG col hidden">
-			<div id="settPanel" class="puPanelrow">
+			<div id="settPanel" class="puPanel row">
 				<div id="settPanelWindow" class="puPanelWindow col">
 					<h2>Settings:</h2>
+
 					<label for="portNr">Websocket-Port:&nbsp;
 						<button id="portHintBTN" class="btn hint tooltip">
 							<img src="lib/nfo.svg" class="nfoSvg" height="12px">
@@ -33,10 +38,10 @@
 					</label>
 					<input type="number" class="input" id="portNr" name="portNr" min="1024" max="65535" value="11616">
 
-					<label for="logLvl" class="row">Audio Reduction Method:&nbsp;
+					<label for="logLvl" class="row">Logging:&nbsp;
 						<button id="logLvlHintBTN" class="btn hint tooltip">
 							<img src="lib/nfo.svg" class="nfoSvg" height="12px">
-							<span class="tooltiptext">Log-Levels:\nCritical&nbsp;=&nbsp;reduces unnecessary Audio-Data based on the Threshold Level<br/>Temporal Features&nbsp;=&nbsp;Reduction Based on the behavior of the Signal over Timel</span>
+							<span class="tooltiptext">declares how detailed Logs are written to the Logfile<br/>Log-Location:<br/>%appdata%\Marflow Software\SmartCut\logs\</span>
 						</button>
 					</label>
 					<select name="logLvl" id="logLvl" class="input">
@@ -45,8 +50,8 @@
 						<option value="2"selected>Errors + Status</option>
 						<option value="3">Debug</option>
 					</select>
-
-					<button id="btn_saveConfig" class="btn tooltip" type="run" onclick="saveConfig()">Stop
+					<br/><br/><br/>
+					<button id="btn_saveConfig" class="btn tooltip" type="run" onclick="saveConfig()">Save
 						<span class="tooltiptext">Save to the Config-File</span>
 					</button>
 				</div>
@@ -54,7 +59,7 @@
 		</div>
 
 		<div id="wsPanelBG" class="puPanelBG col hidden">
-			<div id="wsPanel" class="puPanelrow">
+			<div id="wsPanel" class="puPanel row">
 				<div id="wsPanelWindow" class="puPanelWindow col">
 					<div id="wsPanelMsgWindow" class="col">
 						<h2>Audio-Analysis:</h2>

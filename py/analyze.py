@@ -3,6 +3,7 @@
 
 import os,datetime
 
+
 CRITICAL = 0
 ERROR = 1
 STATUS = 2
@@ -11,11 +12,11 @@ loglvl=STATUS	# default log level
 logPath=str(os.getenv('APPDATA'))+"\\Marflow Software\\SmartCut\\logs\\"
 logfile = logPath + "Log_Analyse_" + datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S") + ".txt"
 
-def log(msg,lvl=1):
-    if lvl<CRITICAL or lvl>DEBUG: lvl=1
-    logType=""
 
-    if lvl<=loglvl:
+def log(msg,lvl=1):
+    if lvl<CRITICAL & lvl>DEBUG: lvl=1
+    logType=""
+    if lvl<=int(loglvl):
         match lvl:
             case 0: logType="CRITICAL ERROR"
             case 1: logType="ERROR"
@@ -23,7 +24,8 @@ def log(msg,lvl=1):
             case 3: logType="DEBUG"
         msg=f"[{datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}]\t{logType}\n{msg}\n"
         if not os.path.exists(logPath):
-            try: os.makedirs(logPath)
+            try:
+                os.makedirs(logPath)
             except Exception as e:
                 print(f"Error creating log directory:\n{e}\n\ncausing Log-Message:\n{msg}\nPress Enter to exit.")
                 input()
@@ -37,7 +39,6 @@ try:
 except ImportError as e:
     log(f"Import Error: {e}",CRITICAL)
     exit(1)
-
 
 
 cname=""
@@ -72,8 +73,8 @@ def readConfig():
 
 
 
-def preprocess_audio(y_stereo):
-    print(f"starting Pre-Processing Audio.\n.\n.\n.\n")
+async def preprocess_audio(y_stereo,ws):
+    await sendMsg("status",f"starting Pre-Processing Audio.\n.\n.\n.\n",ws)
     y_harm, y_perc = librosa.effects.hpss(y_stereo)
     # plt.figure( dpi=100,figsize=(18.5/2, 10.5/2) )
     # librosa.display.waveshow(y_harm, sr=sr, color="blue",alpha=0.25)
@@ -81,11 +82,11 @@ def preprocess_audio(y_stereo):
     # plt.title('Signal Separation')
     # plt.savefig(tempPath+cname+" - preProcess - Signal-Separation.png")
     # plt.close()
-    y=reduce_Average(y_perc, sr, 'preProcess')
+    y=await reduce_Average(y_perc, sr, 'preProcess',ws)
     return y
 
-def reduce_Threshold(y_stereo, threshold):
-    print(f"\tstarting Threshold Reduction.\n\t.\n\t.\n\t.\n")
+async def reduce_Threshold(y_stereo, threshold,ws):
+    await sendMsg("status",f"\tstarting Threshold Reduction.\n\t.\n\t.\n\t.\n",ws)
     max = np.max(y_stereo)
     threshold =max* ( threshold/100 )
     y_stereo_trimmed = np.where(y_stereo <= max-threshold, 0, y_stereo)
@@ -98,8 +99,8 @@ def reduce_Threshold(y_stereo, threshold):
     return y_stereo_trimmed
 
 
-def reduce_Average(y, sr, process):
-    print(f"\tstarting Average-Threshold Reduction.\n\t.\n\t.\n\t.\n")
+async def reduce_Average(y, sr, process,ws):
+    await sendMsg("status",f"\tstarting Average-Threshold Reduction.\n\t.\n\t.\n\t.\n",ws)
     avg = np.mean(y)*1.25
     y_trimmed = np.where(y <= avg, 0, y)
     # plt.figure(dpi=100, figsize=(18.5/2, 10.5/2))
@@ -110,8 +111,8 @@ def reduce_Average(y, sr, process):
     # plt.close()
     return y_trimmed
 
-def reduce_TempF(y_stereo,threshold):
-    print(f"\tstarting Temporal-Feature Reduction.\n\t.\n\t.\n\t.\n")
+async def reduce_TempF(y_stereo,threshold,ws):
+    await sendMsg("status",f"\tstarting Temporal-Feature Reduction.\n\t.\n\t.\n\t.\n",ws)
     # Calculate first-order difference
     coef=(threshold/100)
     y_preemph = librosa.effects.preemphasis(y_stereo,coef=coef)
@@ -127,22 +128,22 @@ def reduce_TempF(y_stereo,threshold):
     return result
 
 
-def reduction_process(y_stereo, method, threshold):
-    print("starting Audio-Reduction:\n")
+async def reduction_process(y_stereo, method, threshold,ws):
+    await sendMsg("status","starting Audio-Reduction:\n",ws)
     match method:
         case "thB":           # Threshold-based
-            return reduce_Threshold(y_stereo, threshold)
+            return await reduce_Threshold(y_stereo, threshold,ws)
         case "sig_tempF":     # Signal-time-based
-            return reduce_TempF(y_stereo,threshold)
+            return await reduce_TempF(y_stereo,threshold,ws)
 
 
-def postprocess_audio(y_reduced, threshold):
-    print(f"\tstarting postprocessing.\n\n")
-    y_reduced=reduce_Average(y_reduced, sr, 'postProcess')
+async def postprocess_audio(y_reduced, threshold,ws):
+    await sendMsg("status",f"\tstarting postprocessing.\n\n",ws)
+    y_reduced=await reduce_Average(y_reduced, sr, 'postProcess',ws)
     return y_reduced
 
-def select_peaks(data):
-    print(f"\tstarting Detecting Onset-Times.\n\n")
+async def select_peaks(data,ws):
+    await sendMsg("status",f"\tstarting Detecting Onset-Times.\n\n",ws)
     onset_env = librosa.onset.onset_strength(y=data, sr=sr, aggregate=np.median, fmax=8000, n_mels=256)
     # plt.figure( dpi=100,figsize=(18.5/2, 10.5/2) )
     # librosa.display.waveshow(onset_env, sr=sr, color="red")
@@ -161,20 +162,21 @@ def select_peaks(data):
 
     return onset_frames
 
-def peak_detection(y_reduced, threshold):
-    print(f"starting Onset Detection Process.\n\t.\n\t.\n\t.\n")
-    y_reduced_post=postprocess_audio(y_reduced,threshold)
-    peaks = select_peaks(y_reduced_post)
+async def peak_detection(y_reduced, threshold,ws):
+    await sendMsg("status",f"starting Onset Detection Process.\n\t.\n\t.\n\t.\n",ws)
+    y_reduced_post=await postprocess_audio(y_reduced,threshold,ws)
+    peaks = await select_peaks(y_reduced_post,ws)
     return peaks
 
 async def process_data(ws,arg):
-    arg=""
+
 
     # if os.path.exists(tempPath+"arg.json"):
     #     argfile = open(tempPath+"arg.json", "r")
     #     arg = argfile.read()
     #     argfile.close()
 
+    log(f"start processing: {arg}",DEBUG)
 
     arg=arg.replace("\\", "\\\\")
     sr = int(json.loads(arg)["sr"])
@@ -191,10 +193,10 @@ async def process_data(ws,arg):
         audio_path=audio_path.replace("\\", "\\\\")
         y_stereo, sr = librosa.load(clip["path"], mono=False, offset=float(clip["indelay"]), sr = sr, duration=float(clip["end"])-float(clip["indelay"]))
         if preprocess:
-            y_stereo = preprocess_audio(y_stereo)
+            y_stereo = await preprocess_audio(y_stereo,ws)
 
-        y_reduced = reduction_process(y_stereo, method, threshold)
-        peaks = peak_detection(y_reduced, threshold)
+        y_reduced = await reduction_process(y_stereo, method, threshold,ws)
+        peaks = await peak_detection(y_reduced, threshold,ws)
         #convert audio-frames to seconds
         peaks = librosa.frames_to_time(peaks, sr=sr)
         peaks=peaks.tolist()
@@ -204,7 +206,7 @@ async def process_data(ws,arg):
     # export peaks to json
     jsn_processed={"clipdata":clips_processed,"track":track}
     jsn_processed=json.dumps(jsn_processed)
-    await sendMsg('data',jsn_processed,ws)
+    await sendMsg("data",jsn_processed,ws)
     # # write jsn_processed to tempPath
     # processedfile = open(tempPath+"onsets.json", "w")
     # processedfile.write(jsn_processed)
@@ -218,15 +220,28 @@ async def process_data(ws,arg):
 
 
 
+def is_json_string(str):
+    try:
+        json.loads(str)
+        return True
+    except json.JSONDecodeError:
+        return False
 
 
 
 
 async def sendMsg(ctrl,msg,ws):
+    msg = msg.replace('\n', '<br>').replace('\t', '&emsp;')
+    if is_json_string(msg):
+        msg = msg.replace('"', '\\"')
     msg='{"ctrl":"'+ctrl+'","data":"'+msg+'"}'
-    if ws.open:
+    if loglvl==DEBUG:
+        print(msg)
+    if ws is not None and ws.open:
         try:
+            # msg=json.loads(msg)
             await asyncio.wait_for(ws.send(msg),TIMEOUT)
+            log(f"Sent message: {msg}",DEBUG)
         except websockets.exceptions.ConnectionClosedOK:
             log("Connection Closed: connection lost to client",ERROR)
             if task:
@@ -236,9 +251,9 @@ async def sendMsg(ctrl,msg,ws):
             log(f"Send Message: No connection for over {TIMEOUT} seconds, stopping server",STATUS)
             loop.stop()  # Stop the event loop
         except Exception as e:
-            log(f"Unexpected error: {e}",ERROR)
+            log(f"Unexpected error: {e}\n\n\tat: Send Message of Type\n\t\'{ctrl}'\n\twith content:\n\t\t'{msg}'\n",ERROR)
 
-        log(f"Sent message: {msg}",DEBUG)
+
     else:
         log("Connection Closed: no open Connections to client",ERROR)
         if task:
@@ -249,12 +264,11 @@ async def handle_message(ws):
     global task
 
     while True:
-        if ws.open:
+        if ws is not None and ws.open:
             try:
                 log("Waiting for message",DEBUG)
                 message = await asyncio.wait_for(ws.recv(), TIMEOUT)
-                ms=f"Received message"
-                await sendMsg("msg",ms,ws) # receives string like {ctrl:"msg",data:"start Processing"}
+                log(f"received message: {message}",DEBUG)
                 try:
                     data = json.loads(message)
                     # Process the data here
@@ -275,10 +289,8 @@ async def handle_message(ws):
                                     if task:
                                         task.cancel()
                                     loop.stop()
-                                    break
                         case _:
-                            await sendMsg("msg","unknown message received",ws)
-
+                            await sendMsg("msg","1 unknown message received",ws)
                 except json.JSONDecodeError as e:
                     ms=f"Error decoding JSON: {e}"
                     await sendMsg("msg",ms,ws)
@@ -294,12 +306,10 @@ async def handle_message(ws):
             except Exception as e:
                 log(f"Unexpected error: {e}",ERROR)
                 break
-
             if task and not task.done():  # Check if the previous task is still running
                     log("Previous task is still running, waiting for it to finish",DEBUG)
                     message = await ws.recv()
-                    ms=f"Received message"
-                    await sendMsg("msg",ms,ws) # receives string like {ctrl:"msg",data:"start Processing"}
+                    log(f"Received message\nmessage\n\t{message.replace('"', '\\"')}",DEBUG) # receives string like {ctrl:"msg",data:"start Processing"}
                     try:
                         pmsg= json.loads(message)
                         # Process the data here
@@ -307,18 +317,27 @@ async def handle_message(ws):
                             case 'stop':
                                 if task:
                                     task.cancel()
+                                loop.stop()
+                            case 'Data Received':
+                                    await sendMsg("ctrl","done",ws)
                             case _:
-                                await sendMsg("msg","unknown message received",ws)
+                                await sendMsg("msg","Previous received message is of unknown content",ws)
                     except json.JSONDecodeError as e:
                         ms=f"Error decoding JSON: {e}"
                         await sendMsg("msg",ms,ws)
                     await task  # Wait for the previous task to finish
-
+            elif task and task.done():
+                log("Task finished",DEBUG)
+            # else:
+            #     await sendMsg("status","No task running, no task finished\n\tPlease stop and restart the Process.",ws)
+        else:
+            log("Connection Closed: no open Connections to client",ERROR)
+            if task:
+                task.cancel
 
 
 if __name__ == "__main__":
     readConfig()
-
     start_server = websockets.serve(handle_message, "localhost", port)
     # Create and set an event loop
     loop = asyncio.get_event_loop()
@@ -330,10 +349,9 @@ if __name__ == "__main__":
         log(f"Error running server: {e}",CRITICAL)
         exit(1)
     finally:
-        # Cancel all tasks and stop the event loop when the server is stopped
+        # Cancel all tasks if any remains and stop the event loop when the server is stopped
         for task in asyncio.all_tasks(loop):
             task.cancel()
         loop.stop()
         log("Server stopped",STATUS)
-
-    exit(0)
+        exit(0)
