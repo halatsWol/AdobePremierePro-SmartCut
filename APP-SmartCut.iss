@@ -2,8 +2,8 @@
 ; SEE THE DOCUMENTATION FOR DETAILS ON CREATING INNO SETUP SCRIPT FILES!
 
 #define AppName "SmartCut for Adobe Premiere Pro"
-#define AppNameShort "SC4APP
-#define AppVersion "0.9.0"
+#define AppNameShort "SC4APP"
+#define AppVersion "0.9.1"
 #define AppPublisher "Marflow Software"
 #define AppURL "https://dev.kMarflow.com"
 

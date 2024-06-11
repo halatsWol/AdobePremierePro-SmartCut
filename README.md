@@ -1,7 +1,7 @@
 ## Marflow-Software
 # SmartCut - for Adobe Premiere Pro
 
-- Version: 0.9
+- Version: 0.9.1
 - Developer: Halatschek Wolfram
 - Date: May, 2024
 
