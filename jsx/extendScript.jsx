@@ -97,7 +97,6 @@ $.core = {
 		proj = app.project;
 		seq = proj.activeSequence;
 		jsn = JSON.parse(jsn);
-
 		var tnr= jsn.track -1;
 		var track = seq.audioTracks[tnr];
 		var clipdata = [];
@@ -111,52 +110,57 @@ $.core = {
 	},
 
 	applyCuts : function(vtrack){
-		vtrack = vtrack - 1;
+		vtrack = vtrack - 1; // 0 based index (UI is starting on 1)
 		proj = app.project;
 		seq = proj.activeSequence;
 		var markers = seq.markers;
 		var marker = markers.getFirstMarker();
-		for(i = 0; i < markers.numMarkers; i++){
-			var track = seq.videoTracks[vtrack];
-			for(j = 0; j < track.clips.numItems; j++){
-				if(marker.start.seconds >= track.clips[j].start.seconds && marker.start.seconds <= track.clips[j].end.seconds){
-					var duration = track.clips[j].end.seconds - track.clips[j].start.seconds;
-					track.clips[j].end = marker.start;
-					if(j+1 < track.clips.numItems){
-						duration = track.clips[j+1].end.seconds - track.clips[j+1].start.seconds;
-						track.clips[j+1].start = marker.start;
-						track.clips[j+1].end.seconds = track.clips[j+1].start.seconds + duration;
+		var track = seq.videoTracks[vtrack];
+		if(track.clips.numItems > 0){
+			for(i = 0; i < markers.numMarkers; i++){
+				for(j = 0; j < track.clips.numItems; j++){
+					if(marker.start.seconds >= track.clips[j].start.seconds && marker.start.seconds <= track.clips[j].end.seconds){
+						var duration = track.clips[j].end.seconds - track.clips[j].start.seconds;
+						track.clips[j].end = marker.start;
+						if(j+1 < track.clips.numItems){
+							duration = track.clips[j+1].end.seconds - track.clips[j+1].start.seconds;
+							track.clips[j+1].start = marker.start;
+							track.clips[j+1].end.seconds = track.clips[j+1].start.seconds + duration;
+						}
+						else {
+							track.clips[j].end.seconds = track.clips[j].start.seconds + duration;
+						}
+						break;
 					}
-					else {
-						track.clips[j].end.seconds = track.clips[j].start.seconds + duration;
-					}
-					break;
 				}
+			marker = markers.getNextMarker(marker);
 			}
-		marker = markers.getNextMarker(marker);
+		} else {
+			alert("No clips in track");
 		}
 	},
 
 	runPy : function(loglvl){
 		var progData = Folder.appData.fsName;
-
+		var file;
 		if (loglvl == 3) {
-			var file = new File(progData+"/Marflow Software/SmartCut/py/run.bat");
+			file = new File(progData+"/Marflow Software/SmartCut/py/run.bat");
 		}
 		else {
-			var file = new File(progData+"/Marflow Software/SmartCut/py/runquiet.vbs");
+			file = new File(progData+"/Marflow Software/SmartCut/py/runquiet.vbs");
 		}
 		if (file.exists){
 			try{
 				file.execute();
 			} catch(e){
 				alert(e);
+				return 1;
 			}
 		} else {
 			alert("File does not exist");
+			return 1;
 		}
 		$.sleep(2000);
-
 		return 0
 	},
 

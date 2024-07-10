@@ -1,0 +1,27 @@
+@startuml "Websocket Communication"
+
+participant Client
+participant Server
+
+activate Client
+activate Server
+
+Client -> Server: Connect
+Server -> Client: inform readyness (ctrl:"msg",data: "started")
+Client -> Server: Send message (ctrl:"data",data: argData)
+par
+    Server -> Server: Process message
+    Server -> Client: Send status message (ctrl:"Status",data: data)
+
+
+end
+
+Server -> Client: Send processed Data (ctrl:"data",data: onsetData)
+Client -> Server: inform data Received (ctrl:"msg",data: "received")
+Server -> Client: Send message (ctrl:"msg",data: "done")
+Client -> Server: send message (ctrl:"ctrl",data: "close")
+deactivate Server
+
+
+
+@enduml

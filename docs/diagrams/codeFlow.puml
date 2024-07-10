@@ -9,44 +9,42 @@ participant PremierePro as pp
 
 activate user
 activate pp
-
-user -> js: start processing
 activate js
-js -> es: $.core.fetchAudTrackData\n(Parameters)
 activate es
-es <-> pp: Get Audio Track Data
-es -> es: create JSON Data
-js <<-- es: promise resolve (JSON Data)
-js -> es: $.core.writeArgData(JSON Data)
 
-js <<-- es: promise resolve
-js -> es: $.core.runPy()
+user -> js  : start processing
+js -> es  : fetch Audio Track Data
+es <<-->> pp: Get Audio Track Data
+js <<-- es: return Data
+js -> es: run Python
 
-es -> py: Execute Python script
-activate py
-py -> py:start websocket
-es <- py: inform started
-es -> py: send data
+
+es -> py ++ : Execute Python script
+py -> py ++ #LightGray :start websocket
+js <- py: inform started
+js -->> py: send data
 par
-    es <-> py: update status
-    py -> py: Process data
-else
-    py -> es: send processed Data
+    py -> py ++ #Gray: Process data
+    js <-> py : update status
 end
-es -> py: stop python
+py -->> js --: send processed Data
+js -> py: close WebSocket
+deactivate py
 deactivate py
 
-js <<-- es: promise resolve
-js -> es: $.core.setMarkers()
 
+js -> es: set Markers
 es -> pp: set Markers in Sequence
-user <<-- es: alert completion
-box "cutting process" #LightBlue
-    user -> pp: review and modify\nmarkers
+user <<- es: alert completion
+group "cutting process"
+    user -> pp: review and modify\nmarkers (optional)
     user -> js: trigger cutting process
-    js -> es: $.core.applyCuts()
-    es -> pp: repostion video clips
-end box
+    js ->es: fetch markers
+    es <--> pp: get markers
+    js <<-- es: promise resolve (markers)
+    js -> es:  apply Cuts
+    es -> pp: cut video clips
+end
 
 
 deactivate js

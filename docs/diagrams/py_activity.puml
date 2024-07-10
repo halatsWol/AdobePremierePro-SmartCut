@@ -23,13 +23,20 @@ repeat
     case ('ctrl')
       switch (Message Data)
         case ('stop')
-          label stoptsk
+          (A)
+          detach
+          (A)
           :Cancel Task;
           :Stop Event Loop;
           stop
       endswitch
     case ('data')
       :Start Audio Processing Task;
+      note right
+      asyncio task
+      sends Status Messages
+          each processing step
+      end note
       :send data to client;
       :inform client of done;
       :wait for stopcode;
@@ -43,11 +50,14 @@ repeat
   endswitch
 
 
-
-repeat while (timout < 60)
-
-goto stoptsk
-
+:condition alive;
+note right
+websocket.open()
+&& send timeout < 60s
+&& task not done
+end note
+repeat while (alive) is (true)
+(A)
 
 
 

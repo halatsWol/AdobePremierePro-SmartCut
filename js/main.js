@@ -201,7 +201,7 @@ function webSoc(argData) {
         var returnVal = null;
 
         // check readyState to avoid multiple connections
-        if (socket && socket.readyState === WebSocket.OPEN) {
+        if (socket || socket.readyState === WebSocket.OPEN) {
             socket.close();
         }
         document.getElementById("wsPanelStatusMsgs").innerHTML = "";
@@ -303,20 +303,17 @@ function procAud() {
             if (result ==0){
                 webSoc(pyArg).then((data) => {
                     jsStr=JSON.stringify(data);
-                    //alert("post-haste: "+jsStr);
-                    try {
-                        setMarkers(data).then((result) => {
-                            printNFO("\nProcessing Audio Track [" + track + "] completed");
-                        }).catch(error => {
-                            printNFO("\nERROR\nAn error occurred while setting Markers:\n\t", error);
-                        });
-                    } catch (error) {
+                    setMarkers(data).then((result) => {
+                        printNFO("\nProcessing Audio Track [" + track + "] completed");
+                    }).catch(error => {
                         printNFO("\nERROR\nAn error occurred while setting Markers:\n\t", error);
-                    }
+                    });
                 }).catch(error => {
                     // This function will be called when the Promise is rejected
                     alert("An error occurred:", error);
                 });
+            } else {
+                alert("Error starting Python script:\n\t", result);
             }
         });
     });

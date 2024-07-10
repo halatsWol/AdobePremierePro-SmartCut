@@ -76,12 +76,6 @@ def readConfig():
 async def preprocess_audio(y_stereo,ws):
     await sendMsg("status",f"starting Pre-Processing Audio.\n.\n.\n.\n",ws)
     y_harm, y_perc = librosa.effects.hpss(y_stereo)
-    # plt.figure( dpi=100,figsize=(18.5/2, 10.5/2) )
-    # librosa.display.waveshow(y_harm, sr=sr, color="blue",alpha=0.25)
-    # librosa.display.waveshow(y_perc, sr=sr, color="red", alpha=0.5)
-    # plt.title('Signal Separation')
-    # plt.savefig(tempPath+cname+" - preProcess - Signal-Separation.png")
-    # plt.close()
     y=await reduce_Average(y_perc, sr, 'preProcess',ws)
     return y
 
@@ -90,12 +84,6 @@ async def reduce_Threshold(y_stereo, threshold,ws):
     max = np.max(y_stereo)
     threshold =max* ( threshold/100 )
     y_stereo_trimmed = np.where(y_stereo <= max-threshold, 0, y_stereo)
-    # plt.figure(dpi=100, figsize=(18.5/2, 10.5/2))
-    # librosa.display.waveshow(y_stereo, sr=sr, color="blue", alpha=0.25)
-    # librosa.display.waveshow(y_stereo_trimmed, sr=sr, color="red", alpha=0.5)
-    # plt.title("Trimmed Signal")
-    # plt.savefig(tempPath +cname+" - trimSignal.png")
-    # plt.close()
     return y_stereo_trimmed
 
 
@@ -103,12 +91,6 @@ async def reduce_Average(y, sr, process,ws):
     await sendMsg("status",f"\tstarting Average-Threshold Reduction.\n\t.\n\t.\n\t.\n",ws)
     avg = np.mean(y)*1.25
     y_trimmed = np.where(y <= avg, 0, y)
-    # plt.figure(dpi=100, figsize=(18.5/2, 10.5/2))
-    # librosa.display.waveshow(y, sr=sr, color="blue", alpha=0.25)
-    # librosa.display.waveshow(y_trimmed, sr=sr, color="red", alpha=0.5)
-    # plt.title("Average Threshold-reduced Signal")
-    # plt.savefig(tempPath +cname+" - " + process + " - AverageThreshold.png")
-    # plt.close()
     return y_trimmed
 
 async def reduce_TempF(y_stereo,threshold,ws):
@@ -118,13 +100,6 @@ async def reduce_TempF(y_stereo,threshold,ws):
     y_preemph = librosa.effects.preemphasis(y_stereo,coef=coef)
     # Square the differences
     result = y_preemph ** 2
-
-    # plt.figure( dpi=100,figsize=(18.5/2, 10.5/2) )
-    # librosa.display.waveshow(y_stereo, sr=sr, color="blue",alpha=0.25)
-    # librosa.display.waveshow(result, sr=sr, color="red",alpha=0.5)
-    # plt.title("Temporal Feature Reduction")
-    # plt.savefig(tempPath+cname+" - Reduction - TemporalFeature.png")
-    # plt.close()
     return result
 
 
@@ -145,20 +120,9 @@ async def postprocess_audio(y_reduced, threshold,ws):
 async def select_peaks(data,ws):
     await sendMsg("status",f"\tstarting Detecting Onset-Times.\n\n",ws)
     onset_env = librosa.onset.onset_strength(y=data, sr=sr, aggregate=np.median, fmax=8000, n_mels=256)
-    # plt.figure( dpi=100,figsize=(18.5/2, 10.5/2) )
-    # librosa.display.waveshow(onset_env, sr=sr, color="red")
-    # plt.title("Onset Strength")
-    # plt.savefig(tempPath+cname+" - OnsetStrength.png")
-    # plt.close()
-    times = librosa.times_like(onset_env, sr=sr)
     onset_env = librosa.to_mono(onset_env)
     onset_frames = librosa.onset.onset_detect(onset_envelope=onset_env, sr=sr)
-    # plt.figure( dpi=100,figsize=(18.5/2, 10.5/2) )
-    # plt.plot(times, onset_env, label='Onset strength')
-    # plt.vlines(times[onset_frames], 0, onset_env.max(), color='r', alpha=0.9,linestyle='--', label='Onsets')
-    # plt.title("Onset Strength and Onsets")
-    # plt.savefig(tempPath+cname+" - OnsetStrengthOnsets.png")
-    # plt.close()
+
 
     return onset_frames
 
@@ -169,13 +133,6 @@ async def peak_detection(y_reduced, threshold,ws):
     return peaks
 
 async def process_data(ws,arg):
-
-
-    # if os.path.exists(tempPath+"arg.json"):
-    #     argfile = open(tempPath+"arg.json", "r")
-    #     arg = argfile.read()
-    #     argfile.close()
-
     log(f"start processing: {arg}",DEBUG)
 
     arg=arg.replace("\\", "\\\\")
@@ -197,7 +154,7 @@ async def process_data(ws,arg):
 
         y_reduced = await reduction_process(y_stereo, method, threshold,ws)
         peaks = await peak_detection(y_reduced, threshold,ws)
-        #convert audio-frames to seconds
+        #convert audio-frames to seconds & append
         peaks = librosa.frames_to_time(peaks, sr=sr)
         peaks=peaks.tolist()
         clip_processed={"name":cname,"peaks":peaks,"start":clip["start"],"indelay":clip["indelay"],"end":clip["end"]}
@@ -207,16 +164,6 @@ async def process_data(ws,arg):
     jsn_processed={"clipdata":clips_processed,"track":track}
     jsn_processed=json.dumps(jsn_processed)
     await sendMsg("data",jsn_processed,ws)
-    # # write jsn_processed to tempPath
-    # processedfile = open(tempPath+"onsets.json", "w")
-    # processedfile.write(jsn_processed)
-    # processedfile.close()
-
-    # print(f"\nProcessing finished.\nPress Enter to exit.")
-    # ex=input()
-
-    # lockfile.close()
-    # os.remove(tempPath+"lockfile.lck")
 
 
 
@@ -226,7 +173,6 @@ def is_json_string(str):
         return True
     except json.JSONDecodeError:
         return False
-
 
 
 
@@ -354,4 +300,6 @@ if __name__ == "__main__":
             task.cancel()
         loop.stop()
         log("Server stopped",STATUS)
+        if (loglvl==DEBUG):
+            input("Press Enter to exit.")
         exit(0)

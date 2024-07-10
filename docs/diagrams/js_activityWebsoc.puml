@@ -1,0 +1,39 @@
+@startuml "JavaScipt Websocket (Client)"
+start
+: webSoc(argData);
+
+: connect to WebSocket Server;
+
+repeat
+switch (onMessage(data.ctrl))
+  case ( 'msg')
+    switch (data.msg)
+        case (\ndefault)
+          :print;
+      case (\n 'start')
+        : send argData;
+    endswitch
+  case (\n 'status')
+    : print data.data\n\tto UI;
+  case (\n 'ctrl')
+    if (data.data == 'done') then (yes)
+        :send 'stop';
+        if (onsetdata empty) then (yes)
+            end
+        else (no)
+            :return onsetData;
+            stop
+        endif
+    else (no)
+    endif
+  case ('data')
+    :onsetdata=data.data;
+    :send 'data received';
+endswitch
+
+repeat while (connected) is (true)
+
+end
+
+
+@enduml

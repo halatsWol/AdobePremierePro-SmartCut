@@ -1,0 +1,23 @@
+@startuml "Audio Analysis Process"
+start
+
+:load audio clipData;
+repeat
+:load audio clip (librosa.load);
+if (preprocess?) then (yes)
+    :Preprocess audio;
+endif
+:reduce Audio;
+group "detection process"
+    :post process;
+    :detect Peaks (returns Frames);
+    :convert to seconds;
+end group
+
+:add frames to json;
+repeat while (for clip in Clipdata) is (true)
+
+:return final json;
+end
+
+@enduml
